@@ -18,7 +18,26 @@
       "Bash(git config *)",
       "Bash(git branch *)",
       "Bash(git add *)",
-      "Bash(git commit -q -m ' *)"
+      "Bash(git commit -q -m ' *)",
+      "Bash(git push *)",
+      "Bash(cd \"c:/Users/2hej0/Downloads/customer/YouBurrito/FYBCodebase\" && echo \"credential.helper: $\\(git config --get credential.helper || echo NONE\\)\"; ls \"/c/Program Files/Git/mingw64/bin/git-credential-manager.exe\" 2>/dev/null && echo \"GCM present\" || echo \"GCM not at default path\")",
+      "Read(//c/Program Files/Git/mingw64/bin/**)",
+      "Bash(python -c ' *)",
+      "Bash(npm run *)",
+      "Bash(git fetch *)",
+      "Bash(git ls-tree *)",
+      "Bash(git pull *)",
+      "PowerShell(git -C \"c:\\\\Users\\\\2hej0\\\\Downloads\\\\customer\\\\YouBurrito\\\\FYBCodebase\" status --short)",
+      "PowerShell(git -C \"c:\\\\Users\\\\2hej0\\\\Downloads\\\\customer\\\\YouBurrito\\\\FYBCodebase\" diff -- vite.config.ts)",
+      "PowerShell(Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue | Where-Object { $_.LocalPort -in 5173,5174,8080 } | Select-Object LocalAddress,LocalPort,OwningProcess | Format-Table -AutoSize)",
+      "PowerShell(Stop-Process -Id 32624 -Force -ErrorAction SilentlyContinue; Start-Sleep -Milliseconds 800; Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue | Where-Object { $_.LocalPort -in 5173,5174,8080 } | Select-Object LocalPort,OwningProcess | Format-Table -AutoSize)",
+      "PowerShell($r = try { Invoke-WebRequest -Uri \"http://localhost:8080/\" -UseBasicParsing -TimeoutSec 10 } catch { $null }; if \\($r\\) { \"HTTP $\\($r.StatusCode\\) - $\\($r.Content.Length\\) bytes\" } else { \"no response yet\" })",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" --max-time 3 http://localhost:4173/meny)",
+      "Bash(node -e \"const p=require\\('./package.json'\\);console.log\\(Object.keys\\(p.dependencies\\).join\\('\\\\n'\\)\\)\")",
+      "Bash(node -e ' *)",
+      "Bash(npm audit *)",
+      "Bash(echo \"=== TYPECHECK EXIT: $? ===\")",
+      "Bash(claude mcp *)"
     ]
   }
 }

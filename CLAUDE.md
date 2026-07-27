@@ -123,6 +123,8 @@ agree. Every new migration file must end by inserting its own version row.
 | `feature_tiles` | the 3 badges under the hero (`icon` = lucide-react name) |
 | `menu_categories` | the 3 menu cards |
 | `locations` | the 3 restaurant cards |
+| `nav_links` | header + footer navigation |
+| `opening_hours` | footer opening hours |
 | `keep_alive` | single-row heartbeat, see below |
 | `schema_migrations` | the ledger above |
 
@@ -134,6 +136,40 @@ Seeded from the original `Index.tsx` consts by `0002_seed_content.sql`.
 Enabled everywhere. Content tables: `select` for `anon` + `authenticated`, all writes
 `authenticated` only. `keep_alive` has RLS on with **zero policies** — unreachable from
 any browser; only `service_role` (which bypasses RLS) touches it.
+
+### Reading content — `src/lib/cms.ts`
+
+All pages read copy through hooks in `cms.ts`, never from Supabase directly:
+
+```tsx
+const t = useContent();          // t("hero.title_line1")
+const locations = useLocations(); // also: useNavLinks, useOpeningHours,
+                                  // useMenuCategories, useFeatureTiles, useContact
+```
+
+**Every hook falls back to hardcoded copy** and never throws, never blocks, never
+renders empty. Supabase paused, env vars missing, RLS rejection, table not migrated
+yet — all degrade to the last-known-good text. This is deliberate: the free tier
+cold-starts slowly, and a marketing site must never render blank.
+
+Consequences worth knowing:
+
+- **`FALLBACK_*` in `cms.ts` must be updated alongside seeded content.** They ship in
+  the JS bundle and are what visitors see before the fetch resolves. Stale fallbacks
+  cause a visible flash of old copy.
+- **An empty table is treated as "not configured", not "no content"** — deleting every
+  row in the admin UI shows fallbacks rather than blanking a section.
+- Multi-line copy is stored with `\n` and rendered with `whitespace-pre-line`, not
+  `<br>`. Do not put markup in `site_content.value`.
+- `contact.phone` is the only phone value; the `tel:` href is derived by stripping
+  spaces in `useContact()`.
+- `feature_tiles.icon` is a lucide-react *name*; `Index.tsx` maps it through `ICONS`
+  and falls back to `Fish` for anything unrecognised. Adding an icon option to the
+  admin UI means adding it to that map too.
+
+**Still hardcoded — not yet migrated:** `src/pages/Meny.tsx`, `src/pages/Catering.tsx`
+(562 lines, lots of copy), and the `<head>` meta in `index.html`. Sweep these for
+literal Swedish strings when extending the CMS.
 
 ### ⚠️ Keep-alive — non-negotiable
 
@@ -154,14 +190,22 @@ index.html               # entry + all SEO/OG meta (single page, so meta lives h
 vite.config.ts           # react + tailwind plugins, "@" -> ./src, dev port 8080
 src/
   main.tsx               # createRoot
-  App.tsx                # QueryClientProvider + BrowserRouter + 2 routes
+  App.tsx                # QueryClientProvider + BrowserRouter + 4 routes
   index.css              # Tailwind v4 + @font-face(Blackhawk) + oklch design tokens
   pages/
-    Index.tsx            # THE ENTIRE SITE — one file, ~150 lines
+    Index.tsx            # the landing page "/" — hero, menu cards, locations
+    Meny.tsx             # "/meny" — the two menu spreads + order CTAs
+    Catering.tsx         # "/catering" — hero, värden, erbjudanden, process, förfrågan
     NotFound.tsx
-  components/ui/         # 50 shadcn components — ALL UNUSED, see below
+  components/
+    SiteHeader.tsx       # shared header/nav, used by ALL pages
+    SiteFooter.tsx       # shared footer — tagline, nav, öppettider, kontakt
+    ui/                  # 50 shadcn components — ALL UNUSED, see below
   hooks/use-mobile.tsx   # unused
-  lib/utils.ts           # cn()
+  lib/
+    site.ts              # RED / NAVY / ORDER_HEADER / MENU_LINK / NAV_LINKS
+                         # + TAGLINE / CONTACT / OPENING_HOURS
+    utils.ts             # cn()
 public/
   favicon.ico
   assets/                # recovered originals + Lovable asset-ID README
@@ -173,10 +217,32 @@ supabase/
 
 ## Things worth knowing before editing
 
-- **`src/pages/Index.tsx` is the whole site.** Data lives in module-scope consts at the
-  top: `RED` (`#ac1136`), `ORDER_HEADER`, `MENU_LINK`, and the `locations` array.
+- **Brand + link constants live in `src/lib/site.ts`**, not per-page: `RED` (`#ac1136`),
+  `NAVY` (`#0a1f44`), `ORDER_HEADER` (the one Qopla order URL every "Beställ" button uses),
+  `MENU_LINK`, `NAV_LINKS`. Change an order link here and it changes everywhere.
   **These consts are being replaced by Supabase reads (Phase 3).** Until that lands, the
   DB rows and the consts are duplicates — edit both, or the CMS and the page disagree.
+  `Index.tsx` still owns the `locations` array locally.
+- **Real contact details live in `CONTACT` in `src/lib/site.ts`** (`info@foryouburritos.se`,
+  `+46 431 31 14 14`, Östergatan 21). The old catering page printed these as text but linked
+  them to `contact@mysite.com` / `123-456-7890` placeholders — always build `mailto:`/`tel:`
+  hrefs from `CONTACT`, never retype them.
+- **The catering form has no backend.** `Catering.tsx` composes a `mailto:` to `CONTACT.email`
+  with every field filled in. When a Supabase table or form endpoint exists, swap
+  `mailtoHref()` for the insert — the field labels there are the payload.
+- **Redesign in progress (2026-07-27).** The new visual direction is negative-space /
+  minimalistic / franchise, and `src/pages/Meny.tsx` is the first page built to it —
+  generous vertical rhythm, a single large Blackhawk headline, hairline `border-border`
+  rules instead of cards, one navy CTA band. Use it as the reference when converting the
+  remaining sections; `/` is still the older denser layout.
+- **`/meny` is just the two spreads.** The client's entire menu is `public/assets/Menu1.png`
+  and `Menu2.png` — swapping a menu is a file overwrite, no code change. Heads-up:
+  `Menu1.png` is actually a **JPEG** with a `.png` name (browsers sniff it and render it
+  fine). They are wide/dense, so the page pans them horizontally below `md` and offers an
+  "öppna i fullskärm" link rather than shrinking them to unreadable.
+- **`/meny` needs an SPA rewrite on the host.** `vite preview` falls back to `index.html`
+  automatically; a plain static host does not. Deep-linking `/meny` 404s without a
+  `/* -> /index.html 200` rule.
 - **All 50 files in `components/ui/` are unused.** `Index.tsx` imports nothing from them —
   only `lucide-react` icons. They are kept as scaffolding, which is why ~27 Radix packages
   are still in `dependencies`. Safe to delete the folder + those deps if slimming down;
