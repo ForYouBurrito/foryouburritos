@@ -252,17 +252,34 @@ jobs:
             esac
           fi
           echo "Measuring ${TARGET}"
+          LAST_ERR=""
+          OK=0
 
           for strategy in mobile desktop; do
             URL="https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=$(jq -rn --arg s "$TARGET" '$s|@uri')&strategy=${strategy}&category=performance"
             [ -n "${PSI_KEY:-}" ] && URL="${URL}&key=${PSI_KEY}"
 
-            # PageSpeed is slow and rate-limited without a key; a miss here is
-            # not worth failing over.
-            RES=$(curl -sS --max-time 120 --retry 2 --retry-delay 20 "$URL") || {
-              echo "::warning::PageSpeed request failed for ${strategy}."
+            # PageSpeed is slow, and WITHOUT AN API KEY it is rate-limited hard —
+            # 429 is the normal answer from a shared CI runner. Set
+            # PAGESPEED_API_KEY (free, no billing) or expect this to skip.
+            RES=$(curl -sS --max-time 180 --retry 3 --retry-delay 30 --retry-all-errors "$URL") || {
+              echo "::warning::PageSpeed request failed for ${strategy} (network)."
+              LAST_ERR="PageSpeed svarade inte (${strategy})."
               continue
             }
+
+            # curl reports success on a 429/403 because the body is valid JSON.
+            # Without this check the row below is written as all-nulls and the
+            # dashboard shows an empty card as though it had measured something.
+            API_ERR=$(echo "$RES" | jq -r '.error.message // empty' 2>/dev/null || true)
+            if [ -n "${API_ERR}" ]; then
+              echo "::warning::PageSpeed refused ${strategy}: ${API_ERR}"
+              case "${API_ERR}" in
+                *uota*|*ate*imit*) LAST_ERR="PageSpeed nekade förfrågan (kvot). Lägg till PAGESPEED_API_KEY." ;;
+                *)                 LAST_ERR="PageSpeed: ${API_ERR}" ;;
+              esac
+              continue
+            fi
 
             ROW=$(echo "$RES" | jq -c --arg s "$strategy" '{
               strategy: $s,
@@ -272,7 +289,14 @@ jobs:
                        | if . == null then null else round end),
               cls: (.lighthouseResult.audits."cumulative-layout-shift".numericValue // null),
               inp_ms: (.loadingExperience.metrics.INTERACTION_TO_NEXT_PAINT.percentile // null)
-            }' 2>/dev/null) || { echo "::warning::Could not parse PageSpeed response for ${strategy}."; continue; }
+            }' 2>/dev/null) || { echo "::warning::Could not parse PageSpeed response for ${strategy}."; LAST_ERR="Kunde inte tolka svaret från PageSpeed."; continue; }
+
+            # A response that parsed but carries no score measured nothing.
+            if [ "$(echo "$ROW" | jq -r '.performance')" = "null" ]; then
+              echo "::warning::PageSpeed returned no score for ${strategy}."
+              LAST_ERR="PageSpeed kunde inte mäta sidan (${strategy})."
+              continue
+            fi
 
             curl -sS --max-time 60 -X POST "${SUPABASE_URL}/rest/v1/seo_vitals" \
               -H "apikey: ${SERVICE_ROLE_KEY}" \
@@ -280,8 +304,19 @@ jobs:
               -H "Content-Type: application/json" \
               -H "Prefer: return=minimal,resolution=merge-duplicates" \
               -d "[${ROW}]" > /dev/null \
-              && echo "  ${strategy}: $(echo "$ROW" | jq -r '.performance')/100"
+              && { OK=$((OK + 1)); echo "  ${strategy}: $(echo "$ROW" | jq -r '.performance')/100"; }
           done
+
+          # Tell the dashboard why the panel is empty. Without this the admin
+          # sees no performance figures and no explanation, which is exactly the
+          # silent failure this whole file is supposed to avoid.
+          if [ "${OK}" -eq 0 ] && [ -n "${LAST_ERR}" ]; then
+            curl -sS -X PATCH "${SUPABASE_URL}/rest/v1/seo_meta?id=eq.1" \
+              -H "apikey: ${SERVICE_ROLE_KEY}" \
+              -H "Authorization: Bearer ${SERVICE_ROLE_KEY}" \
+              -H "Content-Type: application/json" \
+              -d "$(jq -n --arg e "${LAST_ERR}" '{last_error: $e}')" > /dev/null || true
+          fi
 
       - name: Export CMS content
         env:
