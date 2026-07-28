@@ -1,0 +1,34 @@
+[
+  {
+    "href": "/meny",
+    "id": "490fe9a0-c6b6-4c8f-b2b1-48743be3683e",
+    "is_active": true,
+    "label": "MENY",
+    "sort_order": 1,
+    "updated_at": "2026-07-27T19:52:39.694369+00:00"
+  },
+  {
+    "href": "/catering",
+    "id": "ce58dade-3416-4919-a45d-15f63de2ffe8",
+    "is_active": true,
+    "label": "CATERING",
+    "sort_order": 2,
+    "updated_at": "2026-07-27T19:52:39.694369+00:00"
+  },
+  {
+    "href": "/om-oss",
+    "id": "c0cd756d-891d-4ca2-96eb-c3145b48551f",
+    "is_active": true,
+    "label": "OM OSS",
+    "sort_order": 3,
+    "updated_at": "2026-07-28T07:46:12.742604+00:00"
+  },
+  {
+    "href": "/kontakt",
+    "id": "89731b29-8503-4706-94d5-a1c5941bf04d",
+    "is_active": true,
+    "label": "KONTAKTA OSS",
+    "sort_order": 4,
+    "updated_at": "2026-07-28T11:10:29.589505+00:00"
+  }
+]

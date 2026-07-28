@@ -1,0 +1,82 @@
+[
+  {
+    "applied_at": "2026-07-27T15:32:54.576981+00:00",
+    "name": "cms_schema",
+    "version": "0001"
+  },
+  {
+    "applied_at": "2026-07-27T15:32:54.576981+00:00",
+    "name": "seed_content",
+    "version": "0002"
+  },
+  {
+    "applied_at": "2026-07-27T15:32:54.576981+00:00",
+    "name": "keep_alive_rpc",
+    "version": "0003"
+  },
+  {
+    "applied_at": "2026-07-27T15:32:54.576981+00:00",
+    "name": "schema_migrations",
+    "version": "0004"
+  },
+  {
+    "applied_at": "2026-07-27T19:52:39.694369+00:00",
+    "name": "site_chrome",
+    "version": "0005"
+  },
+  {
+    "applied_at": "2026-07-28T07:46:12.742604+00:00",
+    "name": "om_oss",
+    "version": "0006"
+  },
+  {
+    "applied_at": "2026-07-28T08:25:54.407117+00:00",
+    "name": "om_oss_vision_image",
+    "version": "0007"
+  },
+  {
+    "applied_at": "2026-07-28T08:29:58.229855+00:00",
+    "name": "testimonials",
+    "version": "0008"
+  },
+  {
+    "applied_at": "2026-07-28T09:26:39.342148+00:00",
+    "name": "optimised_media_single_location",
+    "version": "0009"
+  },
+  {
+    "applied_at": "2026-07-28T11:10:29.589505+00:00",
+    "name": "kontakt",
+    "version": "0010"
+  },
+  {
+    "applied_at": "2026-07-28T11:10:44.79+00:00",
+    "name": "meny_catering",
+    "version": "0011"
+  },
+  {
+    "applied_at": "2026-07-28T11:11:00.065298+00:00",
+    "name": "menu_items",
+    "version": "0012"
+  },
+  {
+    "applied_at": "2026-07-28T11:43:38.440044+00:00",
+    "name": "menu_items_sheet2",
+    "version": "0013"
+  },
+  {
+    "applied_at": "2026-07-28T11:49:41.150631+00:00",
+    "name": "menyer_subrows",
+    "version": "0014"
+  },
+  {
+    "applied_at": "2026-07-28T11:57:03.320063+00:00",
+    "name": "remaining_sheet_text",
+    "version": "0015"
+  },
+  {
+    "applied_at": "2026-07-28T12:33:33.353308+00:00",
+    "name": "keep_alive_status",
+    "version": "0016"
+  }
+]

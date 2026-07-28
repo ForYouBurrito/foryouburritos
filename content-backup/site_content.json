@@ -1,0 +1,646 @@
+[
+  {
+    "key": "brand.tagline",
+    "label": "Varumärke: slogan (sidfot)",
+    "multiline": true,
+    "updated_at": "2026-07-27T19:52:39.694369+00:00",
+    "value": "Där tradition möter innovation i varje tugga."
+  },
+  {
+    "key": "catering.cta_quote_label",
+    "label": "Catering: knapp offert",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "BEGÄR OFFERT"
+  },
+  {
+    "key": "catering.eyebrow",
+    "label": "Catering: överrubrik",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "FOR YOU BURRITOS"
+  },
+  {
+    "key": "catering.form_eyebrow",
+    "label": "Catering: formulär överrubrik",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "CATERINGFÖRFRÅGAN"
+  },
+  {
+    "key": "catering.form_title",
+    "label": "Catering: formulär rubrik",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "BERÄTTA OM DITT EVENT"
+  },
+  {
+    "key": "catering.intro",
+    "label": "Catering: ingress",
+    "multiline": true,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "Oavsett om du planerar en familjemiddag, företagsevent eller en större fest, erbjuder For You Burritos catering fylld med smakrika och kreativa rätter. Våra sushi burritos, sticks och bowls är perfekt balanserade och anpassade för alla tillfällen. Med färska ingredienser och unika smakkombinationer garanterar vi en upplevelse som överraskar och imponerar. Låt oss göra ditt evenemang oförglömligt med mat tillagad med passion och kärlek!"
+  },
+  {
+    "key": "catering.offerings_sub",
+    "label": "Catering: underrubrik erbjudanden",
+    "multiline": true,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "Sushi-plattor, sticks, bowls och friterat — anpassat efter ditt tillfälle."
+  },
+  {
+    "key": "catering.offerings_title",
+    "label": "Catering: rubrik erbjudanden",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "VAD VI ERBJUDER"
+  },
+  {
+    "key": "catering.process_sub",
+    "label": "Catering: underrubrik process",
+    "multiline": true,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "Fyra steg från första kontakt till serverad mat."
+  },
+  {
+    "key": "catering.process_title",
+    "label": "Catering: rubrik process",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "SÅ FUNGERAR DET"
+  },
+  {
+    "key": "catering.title",
+    "label": "Catering: rubrik",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "CATERING"
+  },
+  {
+    "key": "contact.address",
+    "label": "Kontakt: adress",
+    "multiline": false,
+    "updated_at": "2026-07-27T19:52:39.694369+00:00",
+    "value": "Östergatan 21, 211 25 Malmö"
+  },
+  {
+    "key": "contact.email",
+    "label": "Kontakt: e-post",
+    "multiline": false,
+    "updated_at": "2026-07-27T19:52:39.694369+00:00",
+    "value": "info@foryouburritos.se"
+  },
+  {
+    "key": "contact.phone",
+    "label": "Kontakt: telefon",
+    "multiline": false,
+    "updated_at": "2026-07-27T19:52:39.694369+00:00",
+    "value": "+46 431 31 14 14"
+  },
+  {
+    "key": "footer.contact_heading",
+    "label": "Sidfot: rubrik kontakt",
+    "multiline": false,
+    "updated_at": "2026-07-27T19:52:39.694369+00:00",
+    "value": "HÖR AV DIG"
+  },
+  {
+    "key": "footer.hours_heading",
+    "label": "Sidfot: rubrik öppettider",
+    "multiline": false,
+    "updated_at": "2026-07-27T19:52:39.694369+00:00",
+    "value": "ÖPPETTIDER"
+  },
+  {
+    "key": "footer.links_heading",
+    "label": "Sidfot: rubrik länkar",
+    "multiline": false,
+    "updated_at": "2026-07-27T19:52:39.694369+00:00",
+    "value": "SNABBLÄNKAR"
+  },
+  {
+    "key": "header.cta_label",
+    "label": "Header: knapptext",
+    "multiline": false,
+    "updated_at": "2026-07-27T13:41:21.137686+00:00",
+    "value": "BESTÄLL ONLINE"
+  },
+  {
+    "key": "header.cta_url",
+    "label": "Header: knapplänk",
+    "multiline": false,
+    "updated_at": "2026-07-27T13:41:21.137686+00:00",
+    "value": "https://foryou.qopla.com/restaurant/for-you-burritos-/qRbQ9pebDD/order"
+  },
+  {
+    "key": "hero.cta_menu_label",
+    "label": "Hero: sekundär knapp",
+    "multiline": false,
+    "updated_at": "2026-07-27T13:41:21.137686+00:00",
+    "value": "VÅR MENY"
+  },
+  {
+    "key": "hero.cta_order_label",
+    "label": "Hero: primär knapp",
+    "multiline": false,
+    "updated_at": "2026-07-27T13:41:21.137686+00:00",
+    "value": "BESTÄLL ONLINE"
+  },
+  {
+    "key": "hero.image_url",
+    "label": "Hero: bild",
+    "multiline": false,
+    "updated_at": "2026-07-27T13:41:21.137686+00:00",
+    "value": "/assets/hero2.png"
+  },
+  {
+    "key": "hero.tagline",
+    "label": "Hero: slogan",
+    "multiline": true,
+    "updated_at": "2026-07-28T11:59:11.003672+00:00",
+    "value": "JAPANESE PRECISION.\nMEXICAN VIBES "
+  },
+  {
+    "key": "hero.title_line1",
+    "label": "Hero: rubrik rad 1",
+    "multiline": false,
+    "updated_at": "2026-07-27T13:41:21.137686+00:00",
+    "value": "SHUSHI"
+  },
+  {
+    "key": "hero.title_line2",
+    "label": "Hero: rubrik rad 2 (röd)",
+    "multiline": false,
+    "updated_at": "2026-07-27T13:41:21.137686+00:00",
+    "value": "BURRITO"
+  },
+  {
+    "key": "kontakt.contact_title",
+    "label": "Kontakt: rubrik ring/maila",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:29.589505+00:00",
+    "value": "Ring/ maila oss"
+  },
+  {
+    "key": "kontakt.eyebrow",
+    "label": "Kontakt: överrubrik",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:29.589505+00:00",
+    "value": "Vi vill gärna höra från dig"
+  },
+  {
+    "key": "kontakt.form_email",
+    "label": "Kontakt: fält mail",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:29.589505+00:00",
+    "value": "Mail"
+  },
+  {
+    "key": "kontakt.form_eyebrow",
+    "label": "Kontakt: formulär överrubrik",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:29.589505+00:00",
+    "value": "SKICKA ETT MEDDELANDE"
+  },
+  {
+    "key": "kontakt.form_intro",
+    "label": "Kontakt: formulär ingress",
+    "multiline": true,
+    "updated_at": "2026-07-28T11:10:29.589505+00:00",
+    "value": "Fyll i formuläret så återkommer vi så snart vi kan. Fält märkta med"
+  },
+  {
+    "key": "kontakt.form_mailto",
+    "label": "Kontakt: kvittens mailto",
+    "multiline": true,
+    "updated_at": "2026-07-28T11:10:29.589505+00:00",
+    "value": "Din e-postklient öppnas med meddelandet ifyllt. Öppnas den inte? Mejla oss direkt på"
+  },
+  {
+    "key": "kontakt.form_message",
+    "label": "Kontakt: fält meddelande",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:29.589505+00:00",
+    "value": "Meddelande"
+  },
+  {
+    "key": "kontakt.form_name",
+    "label": "Kontakt: fält namn",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:29.589505+00:00",
+    "value": "Namn & Efternamn"
+  },
+  {
+    "key": "kontakt.form_phone",
+    "label": "Kontakt: fält telefon",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:29.589505+00:00",
+    "value": "Telefonnummer"
+  },
+  {
+    "key": "kontakt.form_sent",
+    "label": "Kontakt: kvittens skickat",
+    "multiline": true,
+    "updated_at": "2026-07-28T11:10:29.589505+00:00",
+    "value": "Tack! Ditt meddelande är skickat — vi återkommer så snart vi kan."
+  },
+  {
+    "key": "kontakt.form_submit",
+    "label": "Kontakt: knapp skicka",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:29.589505+00:00",
+    "value": "SKICKA"
+  },
+  {
+    "key": "kontakt.form_submit_sending",
+    "label": "Kontakt: knapp skickar",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:29.589505+00:00",
+    "value": "SKICKAR…"
+  },
+  {
+    "key": "kontakt.form_title",
+    "label": "Kontakt: formulär rubrik",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:29.589505+00:00",
+    "value": "Hör av dig"
+  },
+  {
+    "key": "kontakt.hours_title",
+    "label": "Kontakt: rubrik öppettider",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:29.589505+00:00",
+    "value": "Öppettider"
+  },
+  {
+    "key": "kontakt.map_address",
+    "label": "Kontakt: adress för kartan",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:29.589505+00:00",
+    "value": "Östergatan 21, 211 25 Malmö"
+  },
+  {
+    "key": "kontakt.map_cta_label",
+    "label": "Kontakt: knapp öppna karta",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:29.589505+00:00",
+    "value": "ÖPPNA I GOOGLE MAPS"
+  },
+  {
+    "key": "kontakt.map_title",
+    "label": "Kontakt: kartans titel (skärmläsare)",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:29.589505+00:00",
+    "value": "Karta till For You Burritos, Östergatan 21"
+  },
+  {
+    "key": "kontakt.title",
+    "label": "Kontakt: rubrik",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:29.589505+00:00",
+    "value": "Kontakta oss"
+  },
+  {
+    "key": "kontakt.visit_address_line1",
+    "label": "Kontakt: adress rad 1",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:29.589505+00:00",
+    "value": "Östergatan 21"
+  },
+  {
+    "key": "kontakt.visit_address_line2",
+    "label": "Kontakt: adress rad 2",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:29.589505+00:00",
+    "value": "211 25 Malmö"
+  },
+  {
+    "key": "kontakt.visit_cta_label",
+    "label": "Kontakt: knapp karta",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:29.589505+00:00",
+    "value": "VISA PÅ KARTA"
+  },
+  {
+    "key": "kontakt.visit_title",
+    "label": "Kontakt: rubrik besök",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:29.589505+00:00",
+    "value": "Besöka oss"
+  },
+  {
+    "key": "locations.cta_order_label",
+    "label": "Platser: knapp 1",
+    "multiline": false,
+    "updated_at": "2026-07-27T13:41:21.137686+00:00",
+    "value": "BESTÄLL ONLINE"
+  },
+  {
+    "key": "locations.cta_site_label",
+    "label": "Platser: knapp 2",
+    "multiline": false,
+    "updated_at": "2026-07-27T13:41:21.137686+00:00",
+    "value": "VÅR HEMSIDA"
+  },
+  {
+    "key": "locations.heading",
+    "label": "Platser: rubrik",
+    "multiline": false,
+    "updated_at": "2026-07-27T13:41:21.137686+00:00",
+    "value": "BESÖK OSS"
+  },
+  {
+    "key": "locations.subheading",
+    "label": "Platser: underrubrik",
+    "multiline": true,
+    "updated_at": "2026-07-28T09:26:39.342148+00:00",
+    "value": "Vi finns på Östergatan 21 i Malmö. Beställ online, ring oss eller kom förbi."
+  },
+  {
+    "key": "menu.card_cta_label",
+    "label": "Meny: länktext på kort",
+    "multiline": false,
+    "updated_at": "2026-07-27T13:41:21.137686+00:00",
+    "value": "SE MENYN"
+  },
+  {
+    "key": "menu.heading",
+    "label": "Meny: rubrik",
+    "multiline": false,
+    "updated_at": "2026-07-27T13:41:21.137686+00:00",
+    "value": "UPPTÄCK VÅR MENY"
+  },
+  {
+    "key": "menu.subheading",
+    "label": "Meny: underrubrik",
+    "multiline": true,
+    "updated_at": "2026-07-27T13:41:21.137686+00:00",
+    "value": "Sushi möter burrito. Tre kategorier, oändliga möjligheter."
+  },
+  {
+    "key": "meny.cta_body",
+    "label": "Meny: avslutande text",
+    "multiline": true,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "Beställ online och hämta i Malmö eller Lund."
+  },
+  {
+    "key": "meny.cta_button_label",
+    "label": "Meny: avslutande knapp",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "BESTÄLL"
+  },
+  {
+    "key": "meny.cta_heading",
+    "label": "Meny: avslutande rubrik",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "HUNGRIG?"
+  },
+  {
+    "key": "meny.cta_order_label",
+    "label": "Meny: knapp beställ",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "BESTÄLL ONLINE"
+  },
+  {
+    "key": "meny.cta_scroll_label",
+    "label": "Meny: länk till menyn",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "SE MENYN"
+  },
+  {
+    "key": "meny.eyebrow",
+    "label": "Meny: överrubrik",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "FOR YOU BURRITOS"
+  },
+  {
+    "key": "meny.fullscreen_label",
+    "label": "Meny: fullskärmslänk",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "ÖPPNA I FULLSKÄRM"
+  },
+  {
+    "key": "meny.intro",
+    "label": "Meny: ingress",
+    "multiline": true,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "Japansk precision, mexikanska vibbar. Hela sortimentet — sushi burritos, poke bowls, nigiri, maki och rolls — finns i menyerna nedan."
+  },
+  {
+    "key": "meny.note1_body",
+    "label": "Meny: notis 1 text",
+    "multiline": true,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "Måndag–fredag 11–14. Tre lunchlådor med 14 sushibitar var."
+  },
+  {
+    "key": "meny.note1_title",
+    "label": "Meny: notis 1 rubrik",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "LUNCH BOX 119:–"
+  },
+  {
+    "key": "meny.note2_body",
+    "label": "Meny: notis 2 text",
+    "multiline": true,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "Fråga personalen — vi hjälper dig hitta rätt."
+  },
+  {
+    "key": "meny.note2_title",
+    "label": "Meny: notis 2 rubrik",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "ALLERGIER"
+  },
+  {
+    "key": "meny.sheet1_sub",
+    "label": "Meny: blad 1 underrubrik",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "Poke bowls, burrito sticks, lunchlådor & tillägg"
+  },
+  {
+    "key": "meny.sheet1_title",
+    "label": "Meny: blad 1 rubrik",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "SUSHI BURRITOS"
+  },
+  {
+    "key": "meny.sheet2_sub",
+    "label": "Meny: blad 2 underrubrik",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "Sushimenyer, nigiri, maki, inside-out rolls & tillbehör"
+  },
+  {
+    "key": "meny.sheet2_title",
+    "label": "Meny: blad 2 rubrik",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "SUSHI & ROLLS"
+  },
+  {
+    "key": "meny.sheet_cta_body",
+    "label": "Meny: beställruta text",
+    "multiline": true,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "Beställ direkt online — hämta färdigt i Malmö."
+  },
+  {
+    "key": "meny.sheet_cta_title",
+    "label": "Meny: beställruta rubrik",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "Hittat din favorit?"
+  },
+  {
+    "key": "meny.title_line1",
+    "label": "Meny: rubrik rad 1",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "VÅR"
+  },
+  {
+    "key": "meny.title_line2",
+    "label": "Meny: rubrik rad 2 (röd)",
+    "multiline": false,
+    "updated_at": "2026-07-28T11:10:44.79+00:00",
+    "value": "MENY"
+  },
+  {
+    "key": "omoss.cta_body",
+    "label": "Om oss: CTA text",
+    "multiline": false,
+    "updated_at": "2026-07-28T07:46:12.742604+00:00",
+    "value": "Beställ online och hämta i Malmö eller Lund."
+  },
+  {
+    "key": "omoss.cta_heading",
+    "label": "Om oss: CTA rubrik",
+    "multiline": false,
+    "updated_at": "2026-07-28T07:46:12.742604+00:00",
+    "value": "HUNGRIG?"
+  },
+  {
+    "key": "omoss.cta_label",
+    "label": "Om oss: CTA knapp",
+    "multiline": false,
+    "updated_at": "2026-07-28T07:46:12.742604+00:00",
+    "value": "BESTÄLL"
+  },
+  {
+    "key": "omoss.eyebrow",
+    "label": "Om oss: överrubrik",
+    "multiline": false,
+    "updated_at": "2026-07-28T07:46:12.742604+00:00",
+    "value": "FOR YOU BURRITOS"
+  },
+  {
+    "key": "omoss.intro_1",
+    "label": "Om oss: intro, stycke 1",
+    "multiline": true,
+    "updated_at": "2026-07-28T07:46:12.742604+00:00",
+    "value": "Vi är passionerade matälskare som älskar att kombinera det bästa från det japanska och internationella köket. Vår resa började med en enkel idé: att skapa en plats där traditionella smaker möter modern kreativitet, och där varje rätt är en smakupplevelse utöver det vanliga."
+  },
+  {
+    "key": "omoss.intro_2",
+    "label": "Om oss: intro, stycke 2",
+    "multiline": true,
+    "updated_at": "2026-07-28T07:46:12.742604+00:00",
+    "value": "Som en del av Thai Sushi For You i Västra Hamnen bär vi med oss samma kvalitet och passion för matlagning, men med en unik twist – sushi burritos, sticks och bowls som är både innovativa och smakrika."
+  },
+  {
+    "key": "omoss.intro_image",
+    "label": "Om oss: bild intro (URL, valfri)",
+    "multiline": false,
+    "updated_at": "2026-07-28T09:49:11.84231+00:00",
+    "value": "/assets/omoss-butik.jpg"
+  },
+  {
+    "key": "omoss.philosophy_image",
+    "label": "Om oss: bild filosofi (URL, valfri)",
+    "multiline": false,
+    "updated_at": "2026-07-28T09:49:11.84231+00:00",
+    "value": "/assets/omoss-poke.jpg"
+  },
+  {
+    "key": "omoss.philosophy_intro",
+    "label": "Om oss: ingress filosofi",
+    "multiline": true,
+    "updated_at": "2026-07-28T07:46:12.742604+00:00",
+    "value": "Vi tror på att mat ska vara mer än bara en måltid – det ska vara en upplevelse. Därför använder vi alltid:"
+  },
+  {
+    "key": "omoss.philosophy_title",
+    "label": "Om oss: rubrik filosofi",
+    "multiline": false,
+    "updated_at": "2026-07-28T09:53:12.9117+00:00",
+    "value": "VÅR FILOSOFI"
+  },
+  {
+    "key": "omoss.title",
+    "label": "Om oss: rubrik",
+    "multiline": false,
+    "updated_at": "2026-07-28T07:46:12.742604+00:00",
+    "value": "Om oss"
+  },
+  {
+    "key": "omoss.vision_body",
+    "label": "Om oss: text vision",
+    "multiline": true,
+    "updated_at": "2026-07-28T07:46:12.742604+00:00",
+    "value": "Vår vision är att skapa en mötesplats där mat, gemenskap och glädje står i centrum. Oavsett om du besöker oss för en middag, beställer take-away eller anlitar oss för catering, vill vi att varje tugga ska vara minnesvärd."
+  },
+  {
+    "key": "omoss.vision_image",
+    "label": "Om oss: bild vision (URL, valfri)",
+    "multiline": false,
+    "updated_at": "2026-07-28T09:49:11.84231+00:00",
+    "value": "/assets/omoss-sushi.jpg"
+  },
+  {
+    "key": "omoss.vision_title",
+    "label": "Om oss: rubrik vision",
+    "multiline": false,
+    "updated_at": "2026-07-28T07:46:12.742604+00:00",
+    "value": "Vår vision"
+  },
+  {
+    "key": "reviews.heading",
+    "label": "Omdömen: rubrik",
+    "multiline": false,
+    "updated_at": "2026-07-28T08:29:58.229855+00:00",
+    "value": "VAD GÄSTERNA SÄGER"
+  },
+  {
+    "key": "reviews.subheading",
+    "label": "Omdömen: underrubrik",
+    "multiline": false,
+    "updated_at": "2026-07-28T08:29:58.229855+00:00",
+    "value": "Riktiga omdömen från våra gäster på Google."
+  },
+  {
+    "key": "seo.description",
+    "label": "SEO: metabeskrivning",
+    "multiline": true,
+    "updated_at": "2026-07-27T13:41:21.137686+00:00",
+    "value": "Japanese precision. Mexican vibes. Beställ online eller besök oss i Malmö och Lund."
+  },
+  {
+    "key": "seo.title",
+    "label": "SEO: sidtitel",
+    "multiline": false,
+    "updated_at": "2026-07-27T13:41:21.137686+00:00",
+    "value": "For You Burritos — Sushi möter Burrito"
+  }
+]

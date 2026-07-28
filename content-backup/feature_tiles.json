@@ -1,0 +1,29 @@
+[
+  {
+    "icon": "Fish",
+    "id": "fa0f218a-0a58-4825-8d1b-a76a2bbbd6a9",
+    "is_active": true,
+    "sort_order": 1,
+    "subtitle": "Varje dag",
+    "title": "FÄRSKA RÅVAROR",
+    "updated_at": "2026-07-27T13:41:21.137686+00:00"
+  },
+  {
+    "icon": "Hand",
+    "id": "212df5ff-fe00-4a4a-8c8c-f6e01e7a7e9d",
+    "is_active": true,
+    "sort_order": 2,
+    "subtitle": "Med passion",
+    "title": "HANDRULLADE",
+    "updated_at": "2026-07-27T13:41:21.137686+00:00"
+  },
+  {
+    "icon": "Flame",
+    "id": "70f69985-a3fb-4a2a-a998-be5e80485b5d",
+    "is_active": true,
+    "sort_order": 3,
+    "subtitle": "Som sticker ut",
+    "title": "DJÄRVA SMAKER",
+    "updated_at": "2026-07-27T13:41:21.137686+00:00"
+  }
+]

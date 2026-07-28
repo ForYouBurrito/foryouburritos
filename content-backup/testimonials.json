@@ -1,0 +1,42 @@
+[
+  {
+    "author": "Matilda Bernelid",
+    "id": "4bb68545-7a02-4d95-90bd-7e88526d9c4d",
+    "is_active": true,
+    "quote": "Super nice staff, good customer service as soon as you step inside the door. Great sushi burritos. Will definitely eat there again. Strongly recommend 🤩",
+    "rating": 5,
+    "sort_order": 1,
+    "source": "google reviews",
+    "updated_at": "2026-07-28T08:29:58.229855+00:00"
+  },
+  {
+    "author": "Jeanette Cabezas",
+    "id": "77cf5093-5be4-41fa-a846-7cbaacdebc64",
+    "is_active": true,
+    "quote": "Nice staff who assured us that we would be full and therefore did not need to buy \"waiting food\" ....we were really full....so good....so crispy ...so affordable!",
+    "rating": 4,
+    "sort_order": 2,
+    "source": "google reviews",
+    "updated_at": "2026-07-28T08:29:58.229855+00:00"
+  },
+  {
+    "author": "Christoffer Fykell",
+    "id": "291495dc-a890-47ed-95d7-2c089f4cb5e0",
+    "is_active": true,
+    "quote": "Waawwww new taste new concept",
+    "rating": 5,
+    "sort_order": 3,
+    "source": "google reviews",
+    "updated_at": "2026-07-28T08:29:58.229855+00:00"
+  },
+  {
+    "author": "Kia",
+    "id": "4bbecbac-269e-4446-bcad-0d144d632bc9",
+    "is_active": true,
+    "quote": "One of the most busy Sushi outlet. It is because of their attractive deals mainly. There is a seating arrangement but not for many.",
+    "rating": 5,
+    "sort_order": 4,
+    "source": "google reviews",
+    "updated_at": "2026-07-28T08:29:58.229855+00:00"
+  }
+]

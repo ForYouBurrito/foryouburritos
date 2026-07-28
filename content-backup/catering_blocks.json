@@ -1,0 +1,132 @@
+[
+  {
+    "body": "Våra rätter tillagas med noggrant utvalda råvaror för att garantera bästa smak och kvalitet.",
+    "icon": "Leaf",
+    "id": "c3ca8416-62bb-4dc0-b820-62fc604f03ec",
+    "is_active": true,
+    "section": "varden",
+    "sort_order": 1,
+    "title": "Färska ingredienser",
+    "updated_at": "2026-07-28T11:10:44.79+00:00"
+  },
+  {
+    "body": "Perfekta för mingel eller som förrätt, med allt från klassiska makirullar till våra signatur-rullar.",
+    "icon": "",
+    "id": "73bde0b8-7c20-4a97-9d58-df3e3a52465a",
+    "is_active": true,
+    "section": "erbjudanden",
+    "sort_order": 1,
+    "title": "Sushi-plattor",
+    "updated_at": "2026-07-28T11:10:44.79+00:00"
+  },
+  {
+    "body": "Kontakta oss med information om ditt event, antal gäster och önskemål.",
+    "icon": "",
+    "id": "b39c775d-a3ab-44d7-af77-11a660eff444",
+    "is_active": true,
+    "section": "process",
+    "sort_order": 1,
+    "title": "Planering",
+    "updated_at": "2026-07-28T11:10:44.79+00:00"
+  },
+  {
+    "body": "Från sushi och wok till poke bowls och thailändska curryrätter – vi har något för alla smaker.",
+    "icon": "UtensilsCrossed",
+    "id": "e000e4e4-86c9-4cbc-8930-2c240b788d80",
+    "is_active": true,
+    "section": "varden",
+    "sort_order": 2,
+    "title": "Mångsidig meny",
+    "updated_at": "2026-07-28T11:10:44.79+00:00"
+  },
+  {
+    "body": "Smidigt, gott och fullt av smak! Perfekt balanserade rullar fyllda med färska ingredienser, serverade i en lättätlig stick-form.",
+    "icon": "",
+    "id": "d47ede82-e0b5-4b23-8c8e-3d0bb4897c38",
+    "is_active": true,
+    "section": "erbjudanden",
+    "sort_order": 2,
+    "title": "Sushi Burrito Sticks",
+    "updated_at": "2026-07-28T11:10:44.79+00:00"
+  },
+  {
+    "body": "Vi hjälper dig att välja rätter som passar dina behov.",
+    "icon": "",
+    "id": "ee53a420-7870-4e8a-a840-ea0bb17b4854",
+    "is_active": true,
+    "section": "process",
+    "sort_order": 2,
+    "title": "Menyanpassning",
+    "updated_at": "2026-07-28T11:10:44.79+00:00"
+  },
+  {
+    "body": "Vi anpassar menyn efter dina behov, oavsett om det är en liten samling eller ett större event.",
+    "icon": "SlidersHorizontal",
+    "id": "09ee49cb-48f7-4dac-9903-713552ad86ed",
+    "is_active": true,
+    "section": "varden",
+    "sort_order": 3,
+    "title": "Flexibla lösningar",
+    "updated_at": "2026-07-28T11:10:44.79+00:00"
+  },
+  {
+    "body": "Fräscha och färgstarka bowls, perfekt för en hälsosam och modern touch.",
+    "icon": "",
+    "id": "527d431e-c922-4177-be13-d21c64bcf25e",
+    "is_active": true,
+    "section": "erbjudanden",
+    "sort_order": 3,
+    "title": "Poke Bowls",
+    "updated_at": "2026-07-28T11:10:44.79+00:00"
+  },
+  {
+    "body": "Vi levererar maten direkt till ditt event – alltid fräsch och redo att serveras.",
+    "icon": "",
+    "id": "878996a8-8ac4-4d7e-a453-94e6577f701a",
+    "is_active": true,
+    "section": "process",
+    "sort_order": 3,
+    "title": "Leverans",
+    "updated_at": "2026-07-28T11:10:44.79+00:00"
+  },
+  {
+    "body": "Vårt team ser till att allt är perfekt, från matens presentation till leveransen.",
+    "icon": "Sparkles",
+    "id": "760f5a58-53c7-4a2e-a4e8-da1b2f8fcd74",
+    "is_active": true,
+    "section": "varden",
+    "sort_order": 4,
+    "title": "Professionell service",
+    "updated_at": "2026-07-28T11:10:44.79+00:00"
+  },
+  {
+    "body": "Krispiga och läckra alternativ som alla älskar.",
+    "icon": "",
+    "id": "134a745c-029f-4761-a701-9e5b8f27e771",
+    "is_active": true,
+    "section": "erbjudanden",
+    "sort_order": 4,
+    "title": "Friterade specialiteter",
+    "updated_at": "2026-07-28T11:10:44.79+00:00"
+  },
+  {
+    "body": "Behöver du porslin, serveringspersonal eller något annat? Vi fixar det!",
+    "icon": "",
+    "id": "272e5d94-421b-44e0-809b-587e2936c3ac",
+    "is_active": true,
+    "section": "process",
+    "sort_order": 4,
+    "title": "Extra tjänster",
+    "updated_at": "2026-07-28T11:10:44.79+00:00"
+  },
+  {
+    "body": "För att se till att alla gäster är nöjda.",
+    "icon": "",
+    "id": "cc46b27e-9abe-4dac-9a3f-ddc3ad734d9d",
+    "is_active": true,
+    "section": "erbjudanden",
+    "sort_order": 5,
+    "title": "Vegetariska och veganska alternativ",
+    "updated_at": "2026-07-28T11:10:44.79+00:00"
+  }
+]

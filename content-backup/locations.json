@@ -1,0 +1,38 @@
+[
+  {
+    "address1": "Einar Hansens Esplanad 31,",
+    "address2": "211 75 Malmö",
+    "id": "144fe976-5e8f-4aac-b7f9-b10dd5da9e7f",
+    "is_active": false,
+    "map_query": "Einar Hansens Esplanad 31, 211 75 Malmö",
+    "name": "Västra Hamnen",
+    "order_url": "https://foryou.qopla.com/restaurant/thai-n-sushi-for-you---vastra-hamnen/qomYBBd13K/order",
+    "site_url": "https://foryouburritos.se/",
+    "sort_order": 1,
+    "updated_at": "2026-07-28T09:26:39.342148+00:00"
+  },
+  {
+    "address1": "Östergatan 21,",
+    "address2": "211 25 Malmö",
+    "id": "9d762e0c-f688-4722-8913-630d3cea2eb5",
+    "is_active": true,
+    "map_query": "Östergatan 21, 211 25 Malmö",
+    "name": "Caroli",
+    "order_url": "https://foryou.qopla.com/restaurant/for-you-burritos-/qRbQ9pebDD/order",
+    "site_url": "https://foryouburritos.se/",
+    "sort_order": 2,
+    "updated_at": "2026-07-27T13:41:21.137686+00:00"
+  },
+  {
+    "address1": "Kyrkogatan 21,",
+    "address2": "222 22 Lund, Sweden",
+    "id": "be262fdd-c87d-4c94-9d36-3f93974c841a",
+    "is_active": false,
+    "map_query": "Kyrkogatan 21, 222 22 Lund",
+    "name": "Caroli",
+    "order_url": "https://foryou.qopla.com/restaurant/for-you-burritos-/qRbQ9pebDD/order",
+    "site_url": "https://www.thaisushiforyou.se/",
+    "sort_order": 3,
+    "updated_at": "2026-07-28T09:26:39.342148+00:00"
+  }
+]

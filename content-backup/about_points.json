@@ -1,0 +1,23 @@
+[
+  {
+    "body": "Färska och högkvalitativa ingredienser",
+    "id": "f2a81e4c-7805-407c-837a-d54df44c3819",
+    "is_active": true,
+    "sort_order": 1,
+    "updated_at": "2026-07-28T07:46:12.742604+00:00"
+  },
+  {
+    "body": "Autentiska recept från Thailand och Japan",
+    "id": "88a942ca-bce9-42dc-8a95-4b94e9027d4d",
+    "is_active": true,
+    "sort_order": 2,
+    "updated_at": "2026-07-28T07:46:12.742604+00:00"
+  },
+  {
+    "body": "Noggrann tillagning med kärlek och omtanke",
+    "id": "4d6888b6-d2c1-4f68-a158-eb085bf8959d",
+    "is_active": true,
+    "sort_order": 3,
+    "updated_at": "2026-07-28T07:46:12.742604+00:00"
+  }
+]

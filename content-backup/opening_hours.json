@@ -1,0 +1,58 @@
+[
+  {
+    "day_label": "Mån",
+    "hours": "11–21",
+    "id": "b4de4663-8dd6-4d07-8499-4e758bf5e1af",
+    "is_active": true,
+    "sort_order": 1,
+    "updated_at": "2026-07-27T19:52:39.694369+00:00"
+  },
+  {
+    "day_label": "Tis",
+    "hours": "11–21",
+    "id": "09724345-b0fa-4761-91e9-9b05c417aeb8",
+    "is_active": true,
+    "sort_order": 2,
+    "updated_at": "2026-07-28T08:31:45.250784+00:00"
+  },
+  {
+    "day_label": "Ons",
+    "hours": "11–21",
+    "id": "7a8e6067-e2da-4475-a456-19267ca456a6",
+    "is_active": true,
+    "sort_order": 3,
+    "updated_at": "2026-07-27T19:52:39.694369+00:00"
+  },
+  {
+    "day_label": "Tors",
+    "hours": "11–21",
+    "id": "e0a7df86-100e-40f5-901e-21b23599a1f6",
+    "is_active": true,
+    "sort_order": 4,
+    "updated_at": "2026-07-27T19:52:39.694369+00:00"
+  },
+  {
+    "day_label": "Fre",
+    "hours": "11–23",
+    "id": "e58752e8-0bf3-4de0-af23-caf2b971d9ee",
+    "is_active": true,
+    "sort_order": 5,
+    "updated_at": "2026-07-27T19:52:39.694369+00:00"
+  },
+  {
+    "day_label": "Lör",
+    "hours": "12–23",
+    "id": "0a2dea9a-8bf2-45ba-bea3-24479723b067",
+    "is_active": true,
+    "sort_order": 6,
+    "updated_at": "2026-07-27T19:52:39.694369+00:00"
+  },
+  {
+    "day_label": "Sön",
+    "hours": "12–21",
+    "id": "1cc07a59-1e3e-48b7-acf9-1abc617d2dba",
+    "is_active": true,
+    "sort_order": 7,
+    "updated_at": "2026-07-27T19:52:39.694369+00:00"
+  }
+]

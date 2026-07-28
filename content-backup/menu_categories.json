@@ -1,0 +1,32 @@
+[
+  {
+    "description": "Klassiska smaker.\nJapansk tradition.",
+    "id": "04605e29-2a6f-410c-a134-67fe14a7aed1",
+    "image_url": "/assets/sushi.png",
+    "is_active": true,
+    "link_url": "https://foryouburritos.se/",
+    "sort_order": 1,
+    "title": "SUSHI",
+    "updated_at": "2026-07-27T13:41:21.137686+00:00"
+  },
+  {
+    "description": "Kryddstarka favoriter.\nLagade på beställning.",
+    "id": "73620536-536c-442d-99f5-230aa0cf3901",
+    "image_url": "/assets/varma.png",
+    "is_active": true,
+    "link_url": "https://foryouburritos.se/",
+    "sort_order": 2,
+    "title": "VARMA THAIRÄTTER",
+    "updated_at": "2026-07-27T13:41:21.137686+00:00"
+  },
+  {
+    "description": "Krispigt, smakrikt\noch alltid mättande.",
+    "id": "34bc4402-fd1f-409d-9e38-36a2914ab0c3",
+    "image_url": "/assets/friterade.png",
+    "is_active": true,
+    "link_url": "https://foryouburritos.se/",
+    "sort_order": 3,
+    "title": "FRITERADE THAIRÄTTER",
+    "updated_at": "2026-07-27T13:41:21.137686+00:00"
+  }
+]
