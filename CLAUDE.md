@@ -152,6 +152,7 @@ agree. Every new migration file must end by inserting its own version row.
 | `nav_links` | header + footer navigation |
 | `opening_hours` | footer opening hours |
 | `keep_alive` | single-row heartbeat, see below |
+| `seo_daily` / `seo_queries` / `seo_pages` / `seo_vitals` / `seo_meta` | Search Console + PageSpeed figures for `/admin/seo`, see below |
 | `schema_migrations` | the ledger above |
 
 Content tables carry `sort_order`, `is_active`, and an auto-maintained `updated_at`.
@@ -201,6 +202,45 @@ Consequences worth knowing:
 (562 lines, lots of copy), and the `<head>` meta in `index.html`. Sweep these for
 literal Swedish strings when extending the CMS.
 
+### SEO dashboard — `/admin/seo` (2026-07-28)
+
+The admin can see what people searched to reach the site. **The browser never
+calls Google** — the Search Console API needs a private credential and everything
+the admin page loads is public. Instead the keep-alive workflow (which already
+runs on a schedule holding secrets) fetches the numbers and writes them into
+Supabase, and `src/lib/seo-stats.ts` reads them like any other table.
+
+```
+keep-alive.yml ──> Search Console API ──> Supabase ──> /admin/seo
+   (every 2 days, holds the secret)      (authenticated read only)
+```
+
+Deliberately **not** built like `cms.ts`: there are no fallbacks. Fabricating a
+number would show the client traffic they don't have, so every hook returns an
+empty array and the page renders a "Väntar på data från Google" state instead.
+
+**"No data" is the expected state until the site is live and indexed** — days for
+the first rows, weeks for useful ones. Do not treat an empty dashboard as a bug
+without first checking `seo_meta.last_error`, which is where a failed fetch is
+recorded so stale figures are never presented as current.
+
+RLS differs from the content tables: `anon` gets **nothing** (which search terms
+convert is competitive information, and the anon key is public), `authenticated`
+gets select, and only `service_role` writes.
+
+Optional GitHub secrets — **all three steps skip cleanly when unset**, so the
+keep-alive ping is never at risk:
+
+| Secret | Purpose |
+| --- | --- |
+| `SEARCH_CONSOLE_SITE_URL` | the property, either `https://foryouburritos.se/` or `sc-domain:foryouburritos.se` |
+| `GOOGLE_SERVICE_ACCOUNT_JSON` | service account key; the account's email must be added as a user on the Search Console property |
+| `PAGESPEED_API_KEY` | optional — PageSpeed works without it, just rate-limited |
+
+`seo_queries` / `seo_pages` are a current top-25, replaced wholesale each run.
+`seo_daily` is upserted on `day`, so a re-run corrects a day rather than
+duplicating it.
+
 ### ⚠️ Keep-alive — non-negotiable
 
 Supabase pauses free-tier projects after **7 days without queries**, which would take the
@@ -234,7 +274,10 @@ src/
     SiteFooter.tsx       # shared footer — tagline, nav, öppettider, kontakt
     ui/                  # 50 shadcn components — ALL UNUSED, see below
   hooks/use-mobile.tsx   # unused
+  pages/admin/
+    AdminSeo.tsx         # "/admin/seo" — Search Console figures, read-only
   lib/
+    seo-stats.ts         # read layer for the SEO tables. NO fallbacks, by design
     site.ts              # RED / NAVY / ORDER_HEADER / MENU_LINK / NAV_LINKS
                          # + TAGLINE / CONTACT / OPENING_HOURS
     utils.ts             # cn()

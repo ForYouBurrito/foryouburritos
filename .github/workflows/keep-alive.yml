@@ -75,6 +75,191 @@ jobs:
 
           echo "::notice::Supabase pinged successfully."
 
+      # -------------------------------------------------------------------
+      # Google Search Console -> Supabase -> /admin/seo
+      #
+      # The admin dashboard cannot call Google itself: the API needs a private
+      # credential and everything the browser loads is public. This job already
+      # runs on a schedule holding secrets, so it does the fetch and writes the
+      # numbers into Supabase for the dashboard to read.
+      #
+      # Entirely optional. Until the site is live and verified in Search Console
+      # the secrets are unset, every step below skips, and the dashboard shows
+      # its "waiting for Google" state. Nothing here can fail the keep-alive
+      # ping, which is the part that actually matters.
+      # -------------------------------------------------------------------
+      - name: Are the SEO secrets configured?
+        id: seo
+        env:
+          CREDS: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          SITE: ${{ secrets.SEARCH_CONSOLE_SITE_URL }}
+        run: |
+          if [ -n "${CREDS}" ] && [ -n "${SITE}" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::SEO secrets not set — skipping the Search Console fetch."
+          fi
+
+      - name: Authenticate to Google
+        id: gauth
+        if: steps.seo.outputs.ready == 'true'
+        continue-on-error: true
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          token_format: access_token
+          access_token_scopes: https://www.googleapis.com/auth/webmasters.readonly
+
+      - name: Fetch Search Console stats
+        if: steps.seo.outputs.ready == 'true'
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SITE: ${{ secrets.SEARCH_CONSOLE_SITE_URL }}
+          TOKEN: ${{ steps.gauth.outputs.access_token }}
+        run: |
+          set -uo pipefail
+
+          fail() {
+            echo "::warning::$1"
+            # Record it so the dashboard says "the last fetch failed" instead of
+            # presenting stale numbers as current.
+            curl -sS -X PATCH "${SUPABASE_URL}/rest/v1/seo_meta?id=eq.1" \
+              -H "apikey: ${SERVICE_ROLE_KEY}" \
+              -H "Authorization: Bearer ${SERVICE_ROLE_KEY}" \
+              -H "Content-Type: application/json" \
+              -d "$(jq -n --arg e "$1" '{last_error: $e}')" > /dev/null || true
+            exit 0
+          }
+
+          [ -n "${TOKEN}" ] || fail "Google authentication failed — check GOOGLE_SERVICE_ACCOUNT_JSON."
+
+          # Search Console lags roughly two days, so asking for "today" returns
+          # nothing. 90 days back gives the trend enough to be worth drawing.
+          END=$(date -u -d "-2 days" +%Y-%m-%d)
+          START=$(date -u -d "-92 days" +%Y-%m-%d)
+          SITE_ENC=$(jq -rn --arg s "${SITE}" '$s|@uri')
+          API="https://searchconsole.googleapis.com/webmasters/v3/sites/${SITE_ENC}/searchAnalytics/query"
+
+          query_by() {
+            curl -sS --fail-with-body --max-time 60 --retry 2 --retry-delay 5 \
+              -X POST "${API}" \
+              -H "Authorization: Bearer ${TOKEN}" \
+              -H "Content-Type: application/json" \
+              -d "$(jq -n --arg s "$START" --arg e "$END" --arg d "$1" --argjson n "$2" \
+                    '{startDate:$s, endDate:$e, dimensions:[$d], rowLimit:$n}')"
+          }
+
+          push() { # push <table> <json-array> [extra Prefer]
+            curl -sS --fail-with-body --max-time 60 \
+              -X POST "${SUPABASE_URL}/rest/v1/$1" \
+              -H "apikey: ${SERVICE_ROLE_KEY}" \
+              -H "Authorization: Bearer ${SERVICE_ROLE_KEY}" \
+              -H "Content-Type: application/json" \
+              -H "Prefer: return=minimal${3:+,$3}" \
+              -d "$2" > /dev/null
+          }
+
+          wipe() {
+            curl -sS --max-time 60 -X DELETE "${SUPABASE_URL}/rest/v1/$1?id=not.is.null" \
+              -H "apikey: ${SERVICE_ROLE_KEY}" \
+              -H "Authorization: Bearer ${SERVICE_ROLE_KEY}" \
+              -H "Prefer: return=minimal" > /dev/null
+          }
+
+          # --- daily totals (upserted, so a re-run corrects rather than duplicates)
+          DAILY=$(query_by date 500) || fail "Search Console rejected the request. Is the service account added as a user on the property?"
+          DAILY_ROWS=$(echo "$DAILY" | jq -c '[.rows[]? | {
+            day: .keys[0],
+            clicks: (.clicks // 0 | floor),
+            impressions: (.impressions // 0 | floor),
+            ctr: (.ctr // 0),
+            position: (.position // 0)
+          }]')
+          if [ "$(echo "$DAILY_ROWS" | jq 'length')" -gt 0 ]; then
+            push seo_daily "$DAILY_ROWS" "resolution=merge-duplicates" \
+              || fail "Could not write seo_daily — has migration 0017 been run?"
+          fi
+
+          # --- top queries and pages. These are a current top-25, not a history,
+          #     so the table is replaced rather than appended to.
+          for dim in query page; do
+            RES=$(query_by "$dim" 25) || fail "Search Console request for ${dim} failed."
+            ROWS=$(echo "$RES" | jq -c --arg d "$dim" '[.rows[]?] | to_entries | map({
+              ($d): .value.keys[0],
+              clicks: (.value.clicks // 0 | floor),
+              impressions: (.value.impressions // 0 | floor),
+              ctr: (.value.ctr // 0),
+              position: (.value.position // 0),
+              sort_order: .key
+            })')
+            wipe "seo_${dim}s"
+            if [ "$(echo "$ROWS" | jq 'length')" -gt 0 ]; then
+              push "seo_${dim}s" "$ROWS" || fail "Could not write seo_${dim}s."
+            fi
+            echo "  ${dim}: $(echo "$ROWS" | jq 'length') rows"
+          done
+
+          # Clear any previous error and stamp the time.
+          curl -sS -X PATCH "${SUPABASE_URL}/rest/v1/seo_meta?id=eq.1" \
+            -H "apikey: ${SERVICE_ROLE_KEY}" \
+            -H "Authorization: Bearer ${SERVICE_ROLE_KEY}" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n --arg s "${SITE}" --arg t "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+                  '{site_url:$s, last_fetch_at:$t, last_error:null}')" > /dev/null
+
+          echo "::notice::Search Console stats updated (${START} to ${END})."
+
+      - name: Fetch Core Web Vitals
+        if: steps.seo.outputs.ready == 'true'
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SITE: ${{ secrets.SEARCH_CONSOLE_SITE_URL }}
+          PSI_KEY: ${{ secrets.PAGESPEED_API_KEY }}
+        run: |
+          set -uo pipefail
+
+          # A Search Console property can be recorded either as a URL prefix or
+          # as "sc-domain:example.com". PageSpeed needs a real URL either way.
+          case "${SITE}" in
+            sc-domain:*) TARGET="https://${SITE#sc-domain:}/" ;;
+            *)           TARGET="${SITE}" ;;
+          esac
+
+          for strategy in mobile desktop; do
+            URL="https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=$(jq -rn --arg s "$TARGET" '$s|@uri')&strategy=${strategy}&category=performance"
+            [ -n "${PSI_KEY:-}" ] && URL="${URL}&key=${PSI_KEY}"
+
+            # PageSpeed is slow and rate-limited without a key; a miss here is
+            # not worth failing over.
+            RES=$(curl -sS --max-time 120 --retry 2 --retry-delay 20 "$URL") || {
+              echo "::warning::PageSpeed request failed for ${strategy}."
+              continue
+            }
+
+            ROW=$(echo "$RES" | jq -c --arg s "$strategy" '{
+              strategy: $s,
+              performance: (.lighthouseResult.categories.performance.score // null
+                            | if . == null then null else (. * 100 | round) end),
+              lcp_ms: (.lighthouseResult.audits."largest-contentful-paint".numericValue // null
+                       | if . == null then null else round end),
+              cls: (.lighthouseResult.audits."cumulative-layout-shift".numericValue // null),
+              inp_ms: (.loadingExperience.metrics.INTERACTION_TO_NEXT_PAINT.percentile // null)
+            }' 2>/dev/null) || { echo "::warning::Could not parse PageSpeed response for ${strategy}."; continue; }
+
+            curl -sS --max-time 60 -X POST "${SUPABASE_URL}/rest/v1/seo_vitals" \
+              -H "apikey: ${SERVICE_ROLE_KEY}" \
+              -H "Authorization: Bearer ${SERVICE_ROLE_KEY}" \
+              -H "Content-Type: application/json" \
+              -H "Prefer: return=minimal,resolution=merge-duplicates" \
+              -d "[${ROW}]" > /dev/null \
+              && echo "  ${strategy}: $(echo "$ROW" | jq -r '.performance')/100"
+          done
+
       - name: Export CMS content
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}

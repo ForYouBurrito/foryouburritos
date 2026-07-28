@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, Navigate, useSearchParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import { Check, Loader2, LogOut, SlidersHorizontal } from "lucide-react";
+import { Check, Loader2, LogOut, Search, SlidersHorizontal } from "lucide-react";
 
 import KeepAliveWarning from "@/components/admin/KeepAliveWarning";
 import { useSession } from "@/lib/auth";
@@ -97,6 +97,13 @@ function EditToolbar({ page }: { page: PageKey }) {
               {error}
             </span>
           )}
+          <Link
+            to="/admin/seo"
+            className="inline-flex items-center gap-1.5 rounded-sm px-2 py-1.5 text-[10px] font-bold tracking-wider text-white/70 transition hover:text-white"
+          >
+            <Search className="h-3 w-3" />
+            SEO
+          </Link>
           <Link
             to="/admin/settings"
             className="inline-flex items-center gap-1.5 rounded-sm px-2 py-1.5 text-[10px] font-bold tracking-wider text-white/70 transition hover:text-white"

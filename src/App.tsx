@@ -4,6 +4,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminEdit from "./pages/admin/AdminEdit";
 import AdminLogin from "./pages/admin/AdminLogin";
+import AdminSeo from "./pages/admin/AdminSeo";
 import Catering from "./pages/Catering";
 import Index from "./pages/Index";
 import Kontakt from "./pages/Kontakt";
@@ -29,6 +30,7 @@ export default function App() {
           <Route path="/admin" element={<Navigate to="/admin/edit" replace />} />
           <Route path="/admin/edit" element={<AdminEdit />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
+          <Route path="/admin/seo" element={<AdminSeo />} />
           {/* Keep the catch-all last. */}
           <Route path="*" element={<NotFound />} />
         </Routes>
