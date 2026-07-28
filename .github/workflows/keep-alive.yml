@@ -88,17 +88,32 @@ jobs:
       # its "waiting for Google" state. Nothing here can fail the keep-alive
       # ping, which is the part that actually matters.
       # -------------------------------------------------------------------
-      - name: Are the SEO secrets configured?
+      # The two halves are gated separately on purpose. Search Console needs a
+      # verified property and a service account, which only exist once the site
+      # is on its real domain. PageSpeed needs nothing but a reachable URL — so
+      # a preview deployment can fill the performance panel long before there is
+      # any search data to show.
+      - name: Which SEO sources are configured?
         id: seo
         env:
           CREDS: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
           SITE: ${{ secrets.SEARCH_CONSOLE_SITE_URL }}
+          PUBLIC_URL: ${{ secrets.PUBLIC_SITE_URL }}
         run: |
           if [ -n "${CREDS}" ] && [ -n "${SITE}" ]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
           else
             echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::SEO secrets not set — skipping the Search Console fetch."
+            echo "::notice::Search Console secrets not set — skipping that fetch."
+          fi
+
+          # Fall back to the Search Console property when no separate preview
+          # URL is set, so the real site needs only the one secret.
+          if [ -n "${PUBLIC_URL}" ] || [ -n "${SITE}" ]; then
+            echo "vitals=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "vitals=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No PUBLIC_SITE_URL — skipping Core Web Vitals."
           fi
 
       - name: Authenticate to Google
@@ -213,22 +228,30 @@ jobs:
           echo "::notice::Search Console stats updated (${START} to ${END})."
 
       - name: Fetch Core Web Vitals
-        if: steps.seo.outputs.ready == 'true'
+        if: steps.seo.outputs.vitals == 'true'
         continue-on-error: true
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           SITE: ${{ secrets.SEARCH_CONSOLE_SITE_URL }}
+          PUBLIC_URL: ${{ secrets.PUBLIC_SITE_URL }}
           PSI_KEY: ${{ secrets.PAGESPEED_API_KEY }}
         run: |
           set -uo pipefail
 
-          # A Search Console property can be recorded either as a URL prefix or
-          # as "sc-domain:example.com". PageSpeed needs a real URL either way.
-          case "${SITE}" in
-            sc-domain:*) TARGET="https://${SITE#sc-domain:}/" ;;
-            *)           TARGET="${SITE}" ;;
-          esac
+          # PUBLIC_SITE_URL wins so a preview deployment can be measured while
+          # Search Console still points at the real domain. A Search Console
+          # property may be recorded as "sc-domain:example.com", which is not a
+          # URL, so it has to be turned back into one.
+          if [ -n "${PUBLIC_URL:-}" ]; then
+            TARGET="${PUBLIC_URL}"
+          else
+            case "${SITE}" in
+              sc-domain:*) TARGET="https://${SITE#sc-domain:}/" ;;
+              *)           TARGET="${SITE}" ;;
+            esac
+          fi
+          echo "Measuring ${TARGET}"
 
           for strategy in mobile desktop; do
             URL="https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=$(jq -rn --arg s "$TARGET" '$s|@uri')&strategy=${strategy}&category=performance"
