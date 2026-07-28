@@ -12,6 +12,31 @@
   font-display: swap;
 }
 
+/* The two faces the printed menu sheet is set in, self-hosted (latin subset) so
+   /meny renders identically everywhere instead of depending on locally installed
+   fonts. Only MenuSheet1 uses them. */
+@font-face {
+  font-family: "Lato";
+  src: url("/assets/fonts/Lato-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Lato";
+  src: url("/assets/fonts/Lato-700.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Montserrat";
+  src: url("/assets/fonts/Montserrat-700.woff2") format("woff2");
+  font-weight: 700 800;
+  font-style: normal;
+  font-display: swap;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 /*
@@ -150,5 +175,28 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+  }
+
+  /* Safety net for phones. Any single element that overruns the viewport (a long
+     unbreakable word, a wide embed) otherwise makes the whole page pannable, which
+     reads to a visitor as the site being zoomed in and broken.
+     `clip` rather than `hidden`: it does not create a scroll container, so the
+     sticky header and the sticky order bar on /meny keep working.
+     overflow-y is spelled out because leaving it `visible` next to a non-visible
+     x-axis makes it compute to `clip` as well, which would stop the page
+     scrolling vertically at all. */
+  html {
+    overflow-x: clip;
+    overflow-y: auto;
+  }
+
+  /* Long addresses, emails and Swedish compounds must not be the thing that
+     widens a card past the screen. */
+  h1,
+  h2,
+  h3,
+  p,
+  a {
+    overflow-wrap: break-word;
   }
 }

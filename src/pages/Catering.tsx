@@ -1,7 +1,10 @@
 import { useState } from "react";
 import {
   ArrowRight,
+  Check,
+  CheckCircle2,
   Leaf,
+  Loader2,
   Mail,
   Phone,
   Send,
@@ -10,74 +13,39 @@ import {
   UtensilsCrossed,
 } from "lucide-react";
 
+import MobileActionBar from "@/components/MobileActionBar";
+import Reviews from "@/components/Reviews";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
+import {
+  buildCateringPayload,
+  buildSummary,
+  hasCateringWebhook,
+  sendCateringRequest,
+} from "@/lib/catering-webhook";
+import { useCateringBlocks } from "@/lib/cms";
+import { T } from "@/lib/editing";
 import { CONTACT, NAVY, RED } from "@/lib/site";
 
-const hero = "/assets/hero2.png";
-const sushi = "/assets/sushi.png";
+const heroBg = "/assets/varma.png";
+/**
+ * The client's transparent cut-out, pre-flattened onto #f6f6f4 — the exact
+ * background of the offerings band it sits on. Identical on screen to compositing
+ * the PNG live, at 65 KB instead of 534 KB. Regenerate it if that band's colour
+ * ever changes, or it will show as a grey rectangle.
+ */
+const pokeBowl = { src: "/assets/omoss-poke.jpg", width: 900, height: 506 };
 
-const VALUE_PROPS = [
-  {
-    Icon: Leaf,
-    title: "Färska ingredienser",
-    copy: "Våra rätter tillagas med noggrant utvalda råvaror för att garantera bästa smak och kvalitet.",
-  },
-  {
-    Icon: UtensilsCrossed,
-    title: "Mångsidig meny",
-    copy: "Från sushi och wok till poke bowls och thailändska curryrätter – vi har något för alla smaker.",
-  },
-  {
-    Icon: SlidersHorizontal,
-    title: "Flexibla lösningar",
-    copy: "Vi anpassar menyn efter dina behov, oavsett om det är en liten samling eller ett större event.",
-  },
-  {
-    Icon: Sparkles,
-    title: "Professionell service",
-    copy: "Vårt team ser till att allt är perfekt, från matens presentation till leveransen.",
-  },
-];
+// Brand red on navy is ~1.9:1 — fine for a decorative rule, unreadable as text.
+// The form's required-field asterisk uses this brightened tint instead (5.3:1).
+const RED_ON_NAVY = "#ff5a78";
 
-const OFFERINGS = [
-  {
-    title: "Sushi-plattor",
-    copy: "Perfekta för mingel eller som förrätt, med allt från klassiska makirullar till våra signatur-rullar.",
-  },
-  {
-    title: "Sushi Burrito Sticks",
-    copy: "Smidigt, gott och fullt av smak! Perfekt balanserade rullar fyllda med färska ingredienser, serverade i en lättätlig stick-form.",
-  },
-  {
-    title: "Poke Bowls",
-    copy: "Fräscha och färgstarka bowls, perfekt för en hälsosam och modern touch.",
-  },
-  {
-    title: "Friterade specialiteter",
-    copy: "Krispiga och läckra alternativ som alla älskar.",
-  },
-  {
-    title: "Vegetariska och veganska alternativ",
-    copy: "För att se till att alla gäster är nöjda.",
-  },
-];
+/** Blackhawk carries the brand voice. With no hero image, the type does that work. */
+const DISPLAY = { fontFamily: '"Blackhawk", "Arial Black", Impact, sans-serif' } as const;
 
-const STEPS = [
-  {
-    title: "Planering",
-    copy: "Kontakta oss med information om ditt event, antal gäster och önskemål.",
-  },
-  { title: "Menyanpassning", copy: "Vi hjälper dig att välja rätter som passar dina behov." },
-  {
-    title: "Leverans",
-    copy: "Vi levererar maten direkt till ditt event – alltid fräsch och redo att serveras.",
-  },
-  {
-    title: "Extra tjänster",
-    copy: "Behöver du porslin, serveringspersonal eller något annat? Vi fixar det!",
-  },
-];
+// The värden / erbjudanden / process cards now come from `catering_blocks`.
+// Their fallback copy lives in cms.ts (FALLBACK_CATERING_BLOCKS) so it ships in
+// the bundle; duplicating it here would guarantee the two drift apart.
 
 const DISHES = [
   "Sushi-plattor",
@@ -88,9 +56,30 @@ const DISHES = [
   "Vegetariska och veganska alternativ",
 ];
 
+/** Body copy. Navy at 70% reads ~6.4:1 on white — the grey token only managed 4.7:1. */
+const BODY = "text-[#0a1f44]/70";
+
+// text-base below sm: iOS Safari zooms the whole page in when a focused field is
+// under 16px, and never zooms back out. Keep 16px on phones, 14px from sm up.
+// py-3 puts every control at >=44px tall, the minimum comfortable touch target.
 const inputClass =
-  "w-full rounded-sm border border-border bg-white px-3 py-2.5 text-sm text-[#0a1f44] outline-none transition placeholder:text-muted-foreground focus:border-[#0a1f44] focus:ring-2 focus:ring-[#0a1f44]/10";
-const labelClass = "block text-[10px] font-bold tracking-[0.15em] text-[#0a1f44] sm:text-[11px]";
+  "w-full rounded-sm border border-border bg-white px-3.5 py-3 text-base sm:text-sm text-[#0a1f44] outline-none transition placeholder:text-muted-foreground focus:border-[#0a1f44] focus:ring-2 focus:ring-[#0a1f44]/15";
+const labelClass = "block text-[11px] font-bold tracking-[0.14em] text-[#0a1f44] sm:text-xs";
+
+/** Section heading — Blackhawk title over a one-line summary. */
+function SectionHead({ titleKey, subKey }: { titleKey: string; subKey: string }) {
+  return (
+    <div>
+      <T
+        as="h2"
+        k={titleKey}
+        className="text-3xl leading-none text-[#0a1f44] sm:text-5xl lg:text-6xl"
+        style={DISPLAY}
+      />
+      <T as="p" k={subKey} className={`mt-3 max-w-2xl text-sm sm:text-base ${BODY}`} />
+    </div>
+  );
+}
 
 function Field({
   label,
@@ -143,7 +132,7 @@ function YesNo({
             onChange={() => onChange(option)}
             className="peer sr-only"
           />
-          <span className="block cursor-pointer rounded-sm border border-border py-2.5 text-center text-[11px] font-bold tracking-[0.15em] text-[#0a1f44] transition hover:bg-gray-50 peer-checked:border-[#0a1f44] peer-checked:bg-[#0a1f44] peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-[#0a1f44]/20">
+          <span className="flex min-h-11 cursor-pointer items-center justify-center rounded-sm border border-border text-[11px] font-bold tracking-[0.14em] text-[#0a1f44] transition hover:bg-gray-50 peer-checked:border-[#0a1f44] peer-checked:bg-[#0a1f44] peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-[#0a1f44]/30 peer-focus-visible:ring-offset-2">
             {option.toUpperCase()}
           </span>
         </label>
@@ -165,10 +154,20 @@ const EMPTY_FORM = {
   kommentar: "",
 };
 
+/** idle → sending → sent (webhook took it) | mailto (handed to the mail client). */
+type SubmitStatus = "idle" | "sending" | "sent" | "mailto";
+
+/** catering_blocks.icon holds a lucide name; the CMS stores text, not components. */
+const VALUE_ICONS = { Leaf, UtensilsCrossed, SlidersHorizontal, Sparkles } as const;
+
 export default function Catering() {
+  const valueProps = useCateringBlocks("varden");
+  const offerings = useCateringBlocks("erbjudanden");
+  const steps = useCateringBlocks("process");
+
   const [form, setForm] = useState(EMPTY_FORM);
   const [dishes, setDishes] = useState<string[]>([]);
-  const [sent, setSent] = useState(false);
+  const [status, setStatus] = useState<SubmitStatus>("idle");
 
   const set = (key: keyof typeof EMPTY_FORM) => (value: string) =>
     setForm((f) => ({ ...f, [key]: value }));
@@ -176,221 +175,290 @@ export default function Catering() {
   const toggleDish = (dish: string) =>
     setDishes((d) => (d.includes(dish) ? d.filter((x) => x !== dish) : [...d, dish]));
 
-  /**
-   * There is no backend on this site, so the form hands the filled-in request to the
-   * visitor's mail client addressed to the real inbox. Swap this for a Supabase insert
-   * (or a form endpoint) once one exists — the field names above are the payload.
-   */
-  const mailtoHref = () => {
-    const rows: [string, string][] = [
-      ["Fullständigt namn", form.namn],
-      ["Mail", form.mail],
-      ["Telefonnummer", form.telefon],
-      ["Evenemangstyp", form.evenemangstyp],
-      ["Datum", form.datum],
-      ["Tid", form.tid],
-      ["Antal gäster", form.gaster],
-      ["Serveringspersonal", form.personal],
-      ["Leverans", form.leverans],
-      ["Maträtter", dishes.join(", ")],
-      ["Önskemål / kommentar", form.kommentar],
-    ];
-    const body = rows.map(([k, v]) => `${k}: ${v || "-"}`).join("\n");
-    return `mailto:${CONTACT.email}?subject=${encodeURIComponent(
+  /** The fallback: hand the filled-in request to the visitor's mail client. */
+  const mailtoHref = () =>
+    `mailto:${CONTACT.email}?subject=${encodeURIComponent(
       `Cateringförfrågan – ${form.namn}`,
-    )}&body=${encodeURIComponent(body)}`;
-  };
+    )}&body=${encodeURIComponent(buildSummary(form, dishes))}`;
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  /**
+   * POST to VITE_CATERING_WEBHOOK_URL when it is configured. Until it is — and
+   * whenever the endpoint is down, times out or rejects CORS — the request falls
+   * through to `mailto:` rather than being dropped on the floor.
+   */
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setStatus("sending");
+
+    const payload = buildCateringPayload(form, dishes);
+
+    if (hasCateringWebhook) {
+      const result = await sendCateringRequest(payload);
+      if (result.ok) {
+        setForm(EMPTY_FORM);
+        setDishes([]);
+        setStatus("sent");
+        return;
+      }
+      console.warn("[catering] webhook failed, falling back to mailto:", result.reason);
+    } else if (import.meta.env.DEV) {
+      // No endpoint yet — show what would have been sent.
+      console.info("[catering] no VITE_CATERING_WEBHOOK_URL set. Payload:", payload);
+    }
+
     window.location.href = mailtoHref();
-    setSent(true);
+    setStatus("mailto");
   };
 
   return (
     <div className="min-h-screen bg-white">
       <SiteHeader />
 
-      {/* Hero */}
-      <section className="mx-auto max-w-7xl px-4 pt-12 pb-10 sm:px-6 sm:pt-20 sm:pb-16">
-        <div className="grid items-center gap-8 md:grid-cols-2 md:gap-12">
-          <div>
-            <p className="text-[10px] font-bold tracking-[0.35em] text-muted-foreground sm:text-xs">
-              CATERING
-            </p>
-            <h1
-              className="mt-4 leading-[0.9] sm:mt-6"
-              style={{ fontFamily: '"Blackhawk", "Arial Black", Impact, sans-serif' }}
+      {/* ── Hero ─────────────────────────────────────────────────────────────
+          Food photo under a 75% navy tint — deliberately not "/"'s hero2.png.
+          varma.png is the right shot for this: wide, close-up, and already dark
+          behind the subject, so it survives a heavy overlay instead of flattening
+          the way a top-down plate on white marble would. The extra bottom padding
+          is the runway the value-prop cards overlap into. */}
+      <section className="relative isolate overflow-hidden" style={{ backgroundColor: NAVY }}>
+        <img
+          src={heroBg}
+          alt=""
+          width={1920}
+          height={1077}
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        {/* The tint. 75% navy over the image's brightest region still leaves white
+            text at ~7.3:1, so the headline holds up wherever the photo crops to. */}
+        <div className="absolute inset-0" style={{ backgroundColor: NAVY, opacity: 0.75 }} />
+
+        <div className="relative mx-auto max-w-7xl px-4 pt-14 pb-28 sm:px-6 sm:pt-24 sm:pb-40">
+          <T
+            as="p"
+            k="catering.eyebrow"
+            className="text-[11px] font-bold tracking-[0.35em] text-white/80 sm:text-xs"
+          />
+
+          {/* Same red as the BEGÄR OFFERT button below it. */}
+          <div
+            className="mt-6 h-1.5 w-16 sm:w-24"
+            style={{ backgroundColor: RED }}
+            aria-hidden="true"
+          />
+
+          <T
+            as="h1"
+            k="catering.title"
+            className="mt-6 text-6xl leading-[0.85] text-white sm:text-8xl lg:text-[8.5rem]"
+            style={DISPLAY}
+          />
+
+          <T
+            as="p"
+            k="catering.intro"
+            className="mt-8 max-w-2xl text-sm leading-relaxed text-white/80 sm:text-base"
+          />
+
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-5">
+            <a
+              href="#offert"
+              style={{ backgroundColor: RED }}
+              className="inline-flex items-center justify-center gap-2 rounded-sm px-8 py-4 text-xs font-bold tracking-[0.15em] text-white transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1f44] focus-visible:outline-none sm:text-sm"
             >
-              <span className="block text-5xl text-black sm:text-7xl lg:text-8xl">FOR YOU</span>
-              <span className="block text-5xl sm:text-7xl lg:text-8xl" style={{ color: RED }}>
-                BURRITOS
-              </span>
-            </h1>
-            <p className="mt-6 max-w-xl text-sm leading-relaxed text-muted-foreground sm:mt-8 sm:text-base">
-              Oavsett om du planerar en familjemiddag, företagsevent eller en större fest, erbjuder
-              For You Burritos catering fylld med smakrika och kreativa rätter. Våra sushi burritos,
-              sticks och bowls är perfekt balanserade och anpassade för alla tillfällen. Med färska
-              ingredienser och unika smakkombinationer garanterar vi en upplevelse som överraskar
-              och imponerar. Låt oss göra ditt evenemang oförglömligt med mat tillagad med passion
-              och kärlek!
-            </p>
-            <div className="mt-8 flex flex-wrap items-center gap-4 sm:mt-10">
-              <a
-                href="#offert"
-                style={{ backgroundColor: RED }}
-                className="inline-flex items-center justify-center gap-2 rounded-sm px-6 py-3.5 text-xs font-bold tracking-[0.15em] text-white transition hover:opacity-90 sm:px-8 sm:py-4 sm:text-sm"
-              >
-                BEGÄR OFFERT <ArrowRight className="h-4 w-4" />
-              </a>
-              <a
-                href={`tel:${CONTACT.phoneHref}`}
-                className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.15em] text-[#0a1f44] underline-offset-4 transition hover:underline sm:text-sm"
-              >
-                <Phone className="h-3.5 w-3.5" strokeWidth={2} /> {CONTACT.phone}
-              </a>
-            </div>
-          </div>
-          <div>
-            <img
-              src={hero}
-              alt="Sushi burrito"
-              width={549}
-              height={454}
-              className="w-full"
-              decoding="async"
-            />
+              <T k="catering.cta_quote_label" /> <ArrowRight className="h-4 w-4" />
+            </a>
+            <a
+              href={`tel:${CONTACT.phoneHref}`}
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-sm border border-white/25 px-6 text-xs font-bold tracking-[0.15em] text-white transition hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1f44] focus-visible:outline-none sm:min-h-14 sm:text-sm"
+            >
+              <Phone className="h-3.5 w-3.5" strokeWidth={2} /> {CONTACT.phone}
+            </a>
           </div>
         </div>
       </section>
 
-      {/* Value props */}
-      <section className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 sm:pb-20">
-        <div className="grid gap-8 border-t border-border pt-8 sm:grid-cols-2 sm:gap-10 sm:pt-12 lg:grid-cols-4">
-          {VALUE_PROPS.map((v) => (
-            <div key={v.title}>
-              <v.Icon className="h-6 w-6 text-[#0a1f44]" strokeWidth={1.5} />
-              <h2 className="mt-4 text-xs font-bold tracking-[0.15em] text-[#0a1f44] sm:text-sm">
-                {v.title.toUpperCase()}
-              </h2>
-              <p className="mt-2 text-xs leading-relaxed text-muted-foreground sm:text-sm">
-                {v.copy}
-              </p>
-            </div>
-          ))}
+      {/* ── Value props ──────────────────────────────────────────────────────
+          Lifted cards straddling the navy edge: ties the hero to the page and
+          replaces four identical grey text columns with four real objects. */}
+      <section className="relative z-10 mx-auto -mt-16 max-w-7xl px-4 sm:-mt-24 sm:px-6">
+        <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
+          {valueProps.map((v) => {
+            const Icon = VALUE_ICONS[v.icon as keyof typeof VALUE_ICONS] ?? Leaf;
+            return (
+              <div
+                key={v.id ?? v.title}
+                className="rounded-lg border border-[#0a1f44]/10 bg-white p-6 shadow-[0_8px_30px_rgba(10,31,68,0.08)]"
+              >
+                <div
+                  className="flex h-11 w-11 items-center justify-center rounded-sm"
+                  style={{ backgroundColor: NAVY }}
+                  aria-hidden="true"
+                >
+                  <Icon className="h-5 w-5 text-white" strokeWidth={1.75} />
+                </div>
+                {/* uppercase via CSS so editing writes back the stored casing. */}
+                <T
+                  as="h2"
+                  row={v}
+                  table="catering_blocks"
+                  field="title"
+                  className="mt-5 text-xs font-bold tracking-[0.14em] text-[#0a1f44] uppercase sm:text-sm"
+                />
+                <T
+                  as="p"
+                  row={v}
+                  table="catering_blocks"
+                  field="body"
+                  className={`mt-2.5 text-sm leading-relaxed ${BODY}`}
+                />
+              </div>
+            );
+          })}
         </div>
       </section>
 
-      {/* Vad vi erbjuder */}
+      {/* ── Vad vi erbjuder ──────────────────────────────────────────────────
+          Menu-board list, not a card grid: numbered rows scan top-to-bottom in
+          one pass, which is how a fast-food board is read. */}
       <section
         id="erbjudanden"
-        className="mx-auto max-w-7xl scroll-mt-20 px-4 pb-12 sm:px-6 sm:pb-20"
+        className="mt-16 scroll-mt-20 bg-[#f6f6f4] sm:mt-24 sm:scroll-mt-28"
       >
-        <div className="border-t border-border pt-8 sm:pt-12">
-          <div className="flex items-start gap-4 sm:gap-6">
-            <span className="text-xs font-bold tracking-[0.2em] sm:text-sm" style={{ color: RED }}>
-              01
-            </span>
-            <div>
-              <h2 className="text-xl font-black tracking-wide text-[#0a1f44] sm:text-3xl">
-                VAD VI ERBJUDER
-              </h2>
-              <p className="mt-1.5 text-xs text-muted-foreground sm:text-sm">
-                Sushi-plattor, sticks, bowls och friterat — anpassat efter ditt tillfälle.
-              </p>
-            </div>
-          </div>
+        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-24">
+          <SectionHead titleKey="catering.offerings_title" subKey="catering.offerings_sub" />
 
-          <div className="mt-6 grid gap-3 sm:mt-10 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-            {OFFERINGS.map((o) => (
-              <div
-                key={o.title}
-                className="rounded-xl border border-border bg-white p-5 shadow-sm transition hover:shadow-md sm:p-6"
-              >
-                <h3 className="text-xs font-bold tracking-[0.1em] text-[#0a1f44] sm:text-base">
-                  {o.title}
-                </h3>
-                <p className="mt-2 text-xs leading-relaxed text-muted-foreground sm:text-sm">
-                  {o.copy}
-                </p>
-              </div>
-            ))}
-            {/* Sixth cell fills the 3-column grid — brand image, no copy of its own. */}
-            <div className="hidden overflow-hidden rounded-xl border border-border shadow-sm lg:block">
+          <div className="mt-10 grid gap-10 sm:mt-14 lg:grid-cols-12 lg:gap-12">
+            <ol className="lg:col-span-7">
+              {offerings.map((o, i) => (
+                <li
+                  key={o.id ?? o.title}
+                  className="flex gap-4 border-b border-[#0a1f44]/12 py-5 last:border-b-0 sm:gap-6 sm:py-6"
+                >
+                  <span
+                    className="w-7 shrink-0 pt-0.5 text-sm font-black tabular-nums sm:text-base"
+                    style={{ color: RED }}
+                    aria-hidden="true"
+                  >
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <div>
+                    <T
+                      as="h3"
+                      row={o}
+                      table="catering_blocks"
+                      field="title"
+                      className="text-base font-bold text-[#0a1f44] sm:text-lg"
+                    />
+                    <T
+                      as="p"
+                      row={o}
+                      table="catering_blocks"
+                      field="body"
+                      className={`mt-1.5 text-sm leading-relaxed ${BODY}`}
+                    />
+                  </div>
+                </li>
+              ))}
+            </ol>
+
+            {/* Appetite appeal, desktop only. A cut-out rather than a framed photo:
+                object-contain and no rounding, so the bowl sits directly on the
+                #f6f6f4 band with nothing boxing it in. */}
+            <div className="hidden lg:col-span-5 lg:block">
               <img
-                src={sushi}
-                alt="Sushi från For You Burritos"
-                width={1190}
-                height={971}
+                src={pokeBowl.src}
+                alt="Poke bowl från For You Burritos"
+                width={pokeBowl.width}
+                height={pokeBowl.height}
                 loading="lazy"
                 decoding="async"
-                className="h-full w-full object-cover"
+                className="sticky top-28 h-auto w-full object-contain"
               />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Så fungerar det */}
+      {/* ── Så fungerar det ──────────────────────────────────────────────────
+          A connected stepper rather than four floating columns, so the four
+          steps read as one sequence. */}
       <section
         id="sa-fungerar-det"
-        className="mx-auto max-w-7xl scroll-mt-20 px-4 pb-12 sm:px-6 sm:pb-20"
+        className="mx-auto max-w-7xl scroll-mt-20 px-4 py-14 sm:scroll-mt-28 sm:px-6 sm:py-24"
       >
-        <div className="border-t border-border pt-8 sm:pt-12">
-          <div className="flex items-start gap-4 sm:gap-6">
-            <span className="text-xs font-bold tracking-[0.2em] sm:text-sm" style={{ color: RED }}>
-              02
-            </span>
-            <div>
-              <h2 className="text-xl font-black tracking-wide text-[#0a1f44] sm:text-3xl">
-                SÅ FUNGERAR DET
-              </h2>
-              <p className="mt-1.5 text-xs text-muted-foreground sm:text-sm">
-                Fyra steg från första kontakt till serverad mat.
-              </p>
-            </div>
-          </div>
+        <SectionHead titleKey="catering.process_title" subKey="catering.process_sub" />
 
-          <ol className="mt-6 grid gap-6 sm:mt-10 sm:grid-cols-2 sm:gap-8 lg:grid-cols-4">
-            {STEPS.map((s, i) => (
-              <li key={s.title} className="border-t-2 border-[#0a1f44]/10 pt-4">
+        <ol className="mt-10 grid gap-8 sm:mt-14 sm:grid-cols-2 sm:gap-10 lg:grid-cols-4 lg:gap-6">
+          {steps.map((s, i) => (
+            <li key={s.id ?? s.title}>
+              <div className="flex items-center gap-3">
                 <span
-                  className="text-xs font-bold tracking-[0.2em] sm:text-sm"
-                  style={{ color: RED }}
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xs font-bold tabular-nums text-white"
+                  style={{ backgroundColor: NAVY }}
+                  aria-hidden="true"
                 >
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <h3 className="mt-2 text-xs font-bold tracking-[0.15em] text-[#0a1f44] sm:text-sm">
-                  {s.title.toUpperCase()}
-                </h3>
-                <p className="mt-2 text-xs leading-relaxed text-muted-foreground sm:text-sm">
-                  {s.copy}
-                </p>
-              </li>
-            ))}
-          </ol>
-        </div>
+                {/* Rail linking each step to the next — desktop row only. */}
+                {i < steps.length - 1 && (
+                  <span
+                    className="hidden h-px flex-1 bg-[#0a1f44]/15 lg:block"
+                    aria-hidden="true"
+                  />
+                )}
+              </div>
+              <T
+                as="h3"
+                row={s}
+                table="catering_blocks"
+                field="title"
+                className="mt-5 text-xs font-bold tracking-[0.14em] text-[#0a1f44] uppercase sm:text-sm"
+              />
+              <T
+                as="p"
+                row={s}
+                table="catering_blocks"
+                field="body"
+                className={`mt-2.5 text-sm leading-relaxed ${BODY}`}
+              />
+            </li>
+          ))}
+        </ol>
       </section>
 
-      {/* Cateringförfrågan */}
-      <section id="offert" className="scroll-mt-16" style={{ backgroundColor: NAVY }}>
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-20">
-          <div className="max-w-xl">
-            <p className="text-[10px] font-bold tracking-[0.35em] text-white/50 sm:text-xs">
-              CATERINGFÖRFRÅGAN
-            </p>
-            <h2 className="mt-3 text-2xl font-black tracking-wide text-white sm:text-4xl">
-              BERÄTTA OM DITT EVENT
-            </h2>
-            <p className="mt-3 text-xs leading-relaxed text-white/60 sm:text-sm">
+      {/* Proof immediately before the form — the last thing read before deciding
+          whether this kitchen is worth trusting with an event. */}
+      <Reviews className="bg-[#f6f6f4]" />
+
+      {/* ── Cateringförfrågan ────────────────────────────────────────────── */}
+      <section
+        id="offert"
+        className="scroll-mt-20 sm:scroll-mt-28"
+        style={{ backgroundColor: NAVY }}
+      >
+        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-24">
+          <div className="max-w-2xl">
+            <T
+              as="p"
+              k="catering.form_eyebrow"
+              className="text-[11px] font-bold tracking-[0.35em] text-white/70 sm:text-xs"
+            />
+            <T
+              as="h2"
+              k="catering.form_title"
+              className="mt-5 text-3xl leading-none text-white sm:text-5xl lg:text-6xl"
+              style={DISPLAY}
+            />
+            <p className="mt-5 text-sm leading-relaxed text-white/80 sm:text-base">
               Fyll i formuläret så återkommer vi med ett förslag. Fält märkta med{" "}
-              <span style={{ color: RED }}>*</span> är obligatoriska.
+              <span style={{ color: RED_ON_NAVY }}>*</span> är obligatoriska.
             </p>
           </div>
 
           <form
             onSubmit={handleSubmit}
-            className="mt-8 rounded-xl bg-white p-5 shadow-sm sm:mt-10 sm:p-8 lg:p-10"
+            className="mt-10 rounded-xl bg-white p-5 shadow-[0_16px_50px_rgba(0,0,0,0.25)] sm:mt-14 sm:p-8 lg:p-12"
           >
             <div className="grid gap-5 sm:grid-cols-2 sm:gap-6">
               <Field label="Fullständigt namn" htmlFor="namn" required className="sm:col-span-2">
@@ -447,6 +515,7 @@ export default function Catering() {
                   name="gaster"
                   type="number"
                   min={1}
+                  inputMode="numeric"
                   value={form.gaster}
                   onChange={(e) => set("gaster")(e.target.value)}
                   className={inputClass}
@@ -500,10 +569,13 @@ export default function Catering() {
                           onChange={() => toggleDish(dish)}
                           className="peer sr-only"
                         />
+                        {/* Selected state carries a checkmark as well as the red fill —
+                            colour alone is not a reliable signal. */}
                         <span
-                          className="block cursor-pointer rounded-full border border-border px-4 py-2 text-[11px] font-semibold text-[#0a1f44] transition hover:bg-gray-50 peer-checked:border-transparent peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-[#0a1f44]/20 sm:text-xs"
+                          className="flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border border-border px-4 text-xs font-semibold text-[#0a1f44] transition hover:bg-gray-50 peer-checked:border-transparent peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-[#0a1f44]/30 peer-focus-visible:ring-offset-2 sm:text-sm"
                           style={checked ? { backgroundColor: RED } : undefined}
                         >
+                          {checked && <Check className="h-3.5 w-3.5 shrink-0" strokeWidth={3} />}
                           {dish}
                         </span>
                       </label>
@@ -524,39 +596,63 @@ export default function Catering() {
               </Field>
             </div>
 
-            <div className="mt-8 flex flex-wrap items-center gap-4 border-t border-border pt-6">
+            <div className="mt-10 flex flex-col gap-4 border-t border-border pt-8 sm:flex-row sm:flex-wrap sm:items-center sm:gap-6">
               <button
                 type="submit"
+                disabled={status === "sending"}
                 style={{ backgroundColor: RED }}
-                className="inline-flex items-center justify-center gap-2 rounded-sm px-6 py-3.5 text-xs font-bold tracking-[0.15em] text-white transition hover:opacity-90 sm:px-8 sm:py-4 sm:text-sm"
+                className="inline-flex items-center justify-center gap-2 rounded-sm px-8 py-4 text-xs font-bold tracking-[0.15em] text-white transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-[#ac1136] focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm"
               >
-                SKICKA FÖRFRÅGAN <Send className="h-4 w-4" />
+                {status === "sending" ? (
+                  <>
+                    SKICKAR… <Loader2 className="h-4 w-4 animate-spin" />
+                  </>
+                ) : (
+                  <>
+                    SKICKA FÖRFRÅGAN <Send className="h-4 w-4" />
+                  </>
+                )}
               </button>
               <a
                 href={`mailto:${CONTACT.email}`}
-                className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.15em] text-[#0a1f44] underline-offset-4 transition hover:underline"
+                className="inline-flex min-h-11 items-center gap-2 text-xs font-bold tracking-[0.15em] text-[#0a1f44] underline-offset-4 transition hover:underline sm:text-sm"
               >
                 <Mail className="h-3.5 w-3.5" strokeWidth={2} /> {CONTACT.email}
               </a>
             </div>
 
-            {sent && (
-              <p className="mt-4 text-xs text-muted-foreground" role="status">
-                Din e-postklient öppnas med förfrågan ifylld. Öppnas den inte? Mejla oss direkt på{" "}
-                <a
-                  href={`mailto:${CONTACT.email}`}
-                  className="font-semibold text-[#0a1f44] underline underline-offset-2"
+            {/* Submit outcome. aria-live so it is announced without stealing focus. */}
+            <div aria-live="polite">
+              {status === "sent" && (
+                <p
+                  className="mt-6 flex items-start gap-2 rounded-sm bg-[#0a1f44]/5 p-4 text-sm text-[#0a1f44]"
+                  role="status"
                 >
-                  {CONTACT.email}
-                </a>
-                .
-              </p>
-            )}
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={2} />
+                  Tack! Din förfrågan är skickad — vi återkommer så snart vi kan.
+                </p>
+              )}
+
+              {status === "mailto" && (
+                <p className={`mt-6 rounded-sm bg-[#0a1f44]/5 p-4 text-sm ${BODY}`} role="status">
+                  Din e-postklient öppnas med förfrågan ifylld. Öppnas den inte? Mejla oss direkt på{" "}
+                  <a
+                    href={`mailto:${CONTACT.email}`}
+                    className="font-semibold text-[#0a1f44] underline underline-offset-2"
+                  >
+                    {CONTACT.email}
+                  </a>
+                  .
+                </p>
+              )}
+            </div>
           </form>
         </div>
       </section>
 
       <SiteFooter />
+
+      <MobileActionBar />
     </div>
   );
 }

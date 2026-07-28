@@ -84,6 +84,31 @@ for crawlers to fetch it.
 
 `public/assets/README.md` retains the Lovable asset IDs in case anything needs re-fetching.
 
+### Client photo library (2026-07-28)
+
+The client's own photos were pulled from the old WordPress site into `public/assets/`
+under their original names (`sq.png`, `IMG_89*.jpg`, `lax-black.png`, `Hideko-*.png`,
+`Kaeng-Ped-*.png`, `s-1-*.png`, `IMG_8725-*.png`). Four of those PNGs are **transparent
+cut-outs**, which is why they look black in most previewers.
+
+`/om-oss` uses four derivatives generated from them (~740 KB total, down from ~13 MB):
+
+| Derivative | Source | Note |
+| --- | --- | --- |
+| `omoss-hero.jpg` | `IMG_8965-scaled.jpg` | hero, sits under a 75% navy tint |
+| `omoss-butik.jpg` | `sq.png` | the storefront on Östergatan |
+| `omoss-poke.jpg` | `Kaeng-Ped-*.png` | cut-out, flattened on `#f6f6f4` |
+| `omoss-sushi.jpg` | `Hideko-*.png` | cut-out, flattened on white |
+
+⚠️ The last two were transparent PNGs **cropped to their alpha bounding box and
+flattened onto the exact background colour of the section they sit in**. They read as
+floating cut-outs at a quarter of the PNG bytes — but if that section's background
+colour changes, the image shows its box and must be regenerated. There is no
+ImageMagick/sharp here; these were produced with `System.Drawing` from PowerShell.
+
+The unused originals still ship in `dist/` (`public/` is copied wholesale) — roughly
+20 MB of dead weight. Move them out of `public/` if that matters.
+
 ### Known issue: image payload
 
 ~4.5 MB of images load on first paint, and they are badly oversized for their display
@@ -123,6 +148,7 @@ agree. Every new migration file must end by inserting its own version row.
 | `feature_tiles` | the 3 badges under the hero (`icon` = lucide-react name) |
 | `menu_categories` | the 3 menu cards |
 | `locations` | the 3 restaurant cards |
+| `about_points` | the "Vår filosofi" bullets on `/om-oss` |
 | `nav_links` | header + footer navigation |
 | `opening_hours` | footer opening hours |
 | `keep_alive` | single-row heartbeat, see below |
@@ -167,6 +193,10 @@ Consequences worth knowing:
   and falls back to `Fish` for anything unrecognised. Adding an icon option to the
   admin UI means adding it to that map too.
 
+`useAboutImage(key)` is the exception to "empty means fallback": the three optional
+`omoss.*_image` slots return `null` unless the stored value is URL-shaped, because
+`useContent()` resolves an empty value to the key name itself.
+
 **Still hardcoded — not yet migrated:** `src/pages/Meny.tsx`, `src/pages/Catering.tsx`
 (562 lines, lots of copy), and the `<head>` meta in `index.html`. Sweep these for
 literal Swedish strings when extending the CMS.
@@ -196,6 +226,8 @@ src/
     Index.tsx            # the landing page "/" — hero, menu cards, locations
     Meny.tsx             # "/meny" — the two menu spreads + order CTAs
     Catering.tsx         # "/catering" — hero, värden, erbjudanden, process, förfrågan
+    OmOss.tsx            # "/om-oss" — intro, vår filosofi, vår vision. Fully CMS-driven.
+    Kontakt.tsx          # "/kontakt" — masthead + live status, 7/5 bento, form, map
     NotFound.tsx
   components/
     SiteHeader.tsx       # shared header/nav, used by ALL pages
@@ -227,19 +259,41 @@ supabase/
   `+46 431 31 14 14`, Östergatan 21). The old catering page printed these as text but linked
   them to `contact@mysite.com` / `123-456-7890` placeholders — always build `mailto:`/`tel:`
   hrefs from `CONTACT`, never retype them.
-- **The catering form has no backend.** `Catering.tsx` composes a `mailto:` to `CONTACT.email`
-  with every field filled in. When a Supabase table or form endpoint exists, swap
-  `mailtoHref()` for the insert — the field labels there are the payload.
+- **The catering form posts to a webhook placeholder.** `src/lib/catering-webhook.ts` owns
+  the payload shape and the POST; `VITE_CATERING_WEBHOOK_URL` (optional, documented in
+  `.env.example`) is the endpoint. Unset, down, timed out or CORS-rejected — every failure
+  path falls through to the `mailto:` handoff to `CONTACT.email`, so a request is never
+  silently dropped. In dev with no URL set, the payload is logged to the console.
+  The URL **ships in the client bundle and is public**: use a catch hook, not an
+  authenticated API, and rate-limit on the receiving end.
 - **Redesign in progress (2026-07-27).** The new visual direction is negative-space /
   minimalistic / franchise, and `src/pages/Meny.tsx` is the first page built to it —
   generous vertical rhythm, a single large Blackhawk headline, hairline `border-border`
   rules instead of cards, one navy CTA band. Use it as the reference when converting the
   remaining sections; `/` is still the older denser layout.
-- **`/meny` is just the two spreads.** The client's entire menu is `public/assets/Menu1.png`
-  and `Menu2.png` — swapping a menu is a file overwrite, no code change. Heads-up:
-  `Menu1.png` is actually a **JPEG** with a `.png` name (browsers sniff it and render it
-  fine). They are wide/dense, so the page pans them horizontally below `md` and offers an
-  "öppna i fullskärm" link rather than shrinking them to unreadable.
+- **`/meny` sheet 01 is real text; sheet 02 is still a picture.**
+  `src/components/MenuSheet1.tsx` lays every item, price and descriptor over
+  `public/assets/Menu1_empty.png` (the printed spread with the item lines erased), so
+  sheet 01 is selectable, searchable and editable in code. Editing an item = editing the
+  `POKE` / `STICKS` / `TILLAGG` / `BURRITOS` / `LUNCH` arrays in that file, **not** an
+  image swap. Coordinates are original 1024x724 design pixels; positions are `%` and
+  every size is `cqw`, so the sheet scales as one unit at any width.
+  - The category banners, the burrito-stick price block, the LUNCH BOX banner and
+    "ALLERGI ?" are part of the artwork, not text — don't re-add them.
+  - `Menu1_empty.png` carries a burrito-stick photo in the LUNCH BOX card that the print
+    does not have, sitting exactly where the numerals belong. `MenuSheet1` paints it out
+    with a white div. If that background is ever regenerated without the stray photo,
+    delete the mask.
+  - The two faces (Lato, Montserrat) are self-hosted in `public/assets/fonts/` and
+    declared in `index.css`. Sizes in `MenuSheet1` are calibrated to them — changing the
+    font means recalibrating. `BASE` is the global baseline nudge.
+  - To re-verify fidelity: render the component at 1024px and diff ink positions against
+    `Menu1.png` (the original print, a **JPEG** despite the `.png` name).
+
+  Sheet 02 is still `public/assets/Menu2.png` — a file overwrite, no code change. It is
+  wide/dense, so the page pans it horizontally below `md` rather than shrinking it to
+  unreadable, and offers an "öppna i fullskärm" link. Sheet 01 pans too but has no such
+  link: `Menu1.png` is the *old* scan and its copy no longer matches what renders.
 - **`/meny` needs an SPA rewrite on the host.** `vite preview` falls back to `index.html`
   automatically; a plain static host does not. Deep-linking `/meny` 404s without a
   `/* -> /index.html 200` rule.
@@ -254,9 +308,42 @@ supabase/
   only. **There is no dark mode toggle**; the `.dark` block is inert.
 - **Tailwind v4**, configured in CSS (`@theme inline` in `index.css`). There is no
   `tailwind.config.js` and there should not be one.
-- **The page is deliberately `grid-cols-3` / `grid-cols-2` at every breakpoint**, with
-  tiny mobile type (`text-[8px]`, `text-[9px]`). Squeezed-looking mobile layout is
-  intentional, not a bug — confirm before "fixing" it.
+- **`/` is now responsive (2026-07-28).** It used to hold `grid-cols-3` / `grid-cols-2`
+  at every breakpoint with `text-[8px]`/`text-[9px]` type, which was documented here as
+  intentional. The client reported the phone view as broken, so that is reverted: the
+  hero, menu cards and location cards stack to one column below `sm:` and mobile type
+  starts at `text-sm`/`text-xs`. Do not reintroduce the squeeze.
+  Two things caused the page to render *panned sideways* on phones — worth knowing,
+  because either is easy to recreate:
+  1. The hero headline (`text-4xl` Blackhawk) sat in a half-width grid cell. Grid tracks
+     are `minmax(auto, 1fr)`, so the overflowing word widened the track and pushed the
+     whole document past the viewport.
+  2. The header row (logo + phone + `BESTÄLL ONLINE` + burger) measured ~337px of
+     content in the ~288px available at 320px. Resolved by the bottom bar below.
+  `html { overflow-x: clip; overflow-y: auto }` in `index.css` is the backstop. Keep both
+  axes spelled out: with `overflow-y` left `visible`, a non-visible x-axis makes it
+  compute to `clip` too and the page stops scrolling vertically. `clip` not `hidden`,
+  so the sticky header and the sticky order bar keep working.
+- **⚠️ `MobileActionBar` and `SiteHeader` are a pair.** Below `md:` the header carries
+  only the logo and the burger — order and call are deliberately *not* there, because
+  `src/components/MobileActionBar.tsx` pins both to the bottom of the screen for the
+  whole scroll, and duplicating them in the header is what overflowed the row above.
+  **Any page rendering `<SiteHeader>` must also render `<MobileActionBar>` as its last
+  child**, or that page has no order and no call action on mobile at all. All four
+  public pages (`/`, `/meny`, `/catering`, `/om-oss`, `/kontakt`) do. It is `sticky`, not `fixed`,
+  so it parks at the foot of the viewport while scrolling and then settles under the
+  footer — no page needs compensating bottom padding.
+- **`/kontakt` reads `opening_hours` as data, not just text.** Its masthead badge says
+  ÖPPET NU / STÄNGT JUST NU, computed in the browser from that table in
+  `Europe/Stockholm` — the day is matched by the first three letters of `day_label`
+  (`Tors` → `tor`) and `hours` is parsed as `H[:MM]–H[:MM]`. It fails *silent*: if
+  today's label doesn't resolve to exactly one row, or the hours don't parse, no badge
+  renders and today's row is simply not highlighted. So regrouping the rows into
+  "Måndag till torsdag", or writing "Stängt" in an `hours` cell, turns the feature off
+  rather than making the page lie. Nothing else on the site parses these values.
+- **Any `<input>`/`<textarea>` must be ≥16px on phones** (`text-base sm:text-sm`). iOS
+  Safari zooms the page in on focus for anything smaller and never zooms back out —
+  this was the literal "stuck zoomed in" complaint on `/catering` and `/admin`.
 - **Known typo in the design:** the hero reads `SHUSHI` (not `SUSHI`). It is in the
   original Lovable design. Leave it unless asked.
 - Swedish copy — preserve `å ä ö` and don't translate section headings.

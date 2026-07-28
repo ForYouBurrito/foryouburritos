@@ -20,8 +20,8 @@ export const TAGLINE = "Där tradition möter innovation i varje tugga.";
 export const NAV_LINKS = [
   { label: "MENY", href: "/meny" },
   { label: "CATERING", href: "/catering" },
-  { label: "OM OSS", href: MENU_LINK },
-  { label: "KONTAKTA OSS", href: "/#besok-oss" },
+  { label: "OM OSS", href: "/om-oss" },
+  { label: "KONTAKTA OSS", href: "/kontakt" },
 ];
 
 /**

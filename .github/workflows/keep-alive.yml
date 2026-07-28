@@ -1,7 +1,19 @@
 name: Supabase Keep-Alive
 
-# Supabase pauses free-tier projects after 7 days with no queries. This pings
-# every 2 days, well inside that window (~15 runs/month, negligible minutes).
+# Two problems, one workflow.
+#
+# 1. Supabase pauses free-tier projects after 7 days with no database activity.
+#    This pings every 2 days, well inside that window.
+#
+# 2. GitHub disables scheduled workflows in a PUBLIC repository after 60 days of
+#    no repository activity — which would silently switch off the very job that
+#    keeps the database awake. Only NEW COMMITS reset that clock: issues, tags and
+#    releases do not count. So this job also exports the CMS content and commits
+#    it, which resets the clock and, incidentally, gives the project the backup
+#    Supabase's free tier does not provide.
+#
+# The export is the point of the commit, not a trick: `content-backup/*.json` is a
+# restorable snapshot of every editable string on the site.
 on:
   schedule:
     - cron: "0 6 */2 * *" # 06:00 UTC, every second day
@@ -11,11 +23,24 @@ concurrency:
   group: keep-alive
   cancel-in-progress: false
 
+# Needed for the fallback push when KEEPALIVE_PAT is not configured.
+permissions:
+  contents: write
+
 jobs:
   ping:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          # A deploy key, not a personal access token. Tokens expire — a year
+          # later the push fails, the commits stop, and 60 days after that
+          # GitHub switches this workflow off. Deploy keys never expire, and
+          # this one can only push to this single repository.
+          ssh-key: ${{ secrets.KEEPALIVE_DEPLOY_KEY }}
+
       - name: Ping Supabase
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -49,3 +74,51 @@ jobs:
           fi
 
           echo "::notice::Supabase pinged successfully."
+
+      - name: Export CMS content
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p content-backup
+
+          # Every table the site reads. Adding a content table here is what makes
+          # it part of the backup — nothing discovers them automatically.
+          TABLES="site_content menu_items catering_blocks testimonials about_points locations nav_links opening_hours feature_tiles menu_categories schema_migrations"
+
+          for t in $TABLES; do
+            # Sorted by primary-ish key so the JSON is stable between runs and the
+            # diff shows real content changes rather than row-order churn.
+            if curl -sS --fail --max-time 60 --retry 3 --retry-delay 5 \
+                 "${SUPABASE_URL}/rest/v1/${t}?select=*" \
+                 -H "apikey: ${SERVICE_ROLE_KEY}" \
+                 -H "Authorization: Bearer ${SERVICE_ROLE_KEY}" \
+               | jq -S 'sort_by(.slug // .key // .version // .sort_order // .id)' \
+               > "content-backup/${t}.json"; then
+              echo "  exported ${t}"
+            else
+              echo "::warning::could not export ${t} — leaving the previous snapshot in place"
+              rm -f "content-backup/${t}.json"
+              git checkout -- "content-backup/${t}.json" 2>/dev/null || true
+            fi
+          done
+
+      - name: Commit the snapshot
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add content-backup
+
+          if git diff --cached --quiet; then
+            # Nothing changed. Commit anyway — the commit is what resets GitHub's
+            # 60-day clock, and a fortnight of unedited content is normal for a
+            # restaurant site. --allow-empty keeps the heartbeat regardless.
+            git commit --allow-empty -m "chore: keep-alive $(date -u +%Y-%m-%d)"
+          else
+            git commit -m "chore: content snapshot $(date -u +%Y-%m-%d)"
+          fi
+
+          git push
+          echo "::notice::Snapshot committed — repository activity refreshed."
