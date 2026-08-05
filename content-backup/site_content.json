@@ -94,8 +94,8 @@
     "key": "contact.phone",
     "label": "Kontakt: telefon",
     "multiline": false,
-    "updated_at": "2026-07-27T19:52:39.694369+00:00",
-    "value": "+46 431 31 14 14"
+    "updated_at": "2026-08-04T12:35:24.874781+00:00",
+    "value": "+46765213077"
   },
   {
     "key": "footer.contact_heading",
@@ -164,8 +164,8 @@
     "key": "hero.title_line1",
     "label": "Hero: rubrik rad 1",
     "multiline": false,
-    "updated_at": "2026-07-27T13:41:21.137686+00:00",
-    "value": "SHUSHI"
+    "updated_at": "2026-08-04T10:39:02.276886+00:00",
+    "value": "SUSHI"
   },
   {
     "key": "hero.title_line2",
