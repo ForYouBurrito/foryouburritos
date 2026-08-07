@@ -30,7 +30,7 @@ const CONDENSE = 0.78;
 /* ---------------------------------------------------------------- poke bowls */
 
 /** Name x=43, price column x=150. `y` pairs are name / descriptor ink tops. */
-const POKE: Array<[name: string, price: string, desc: string, y: number, dy: number]> = [
+export const POKE: Array<[name: string, price: string, desc: string, y: number, dy: number]> = [
   ["SUJUK BOWL", "179:-", "Sujuk", 106, 120],
   ["YAKINIKU BOWL", "159:-", "Yakiniku (Marinerad Biff)", 129, 141],
   ["SHRIMP BOWL", "145:-", "Räkor", 157, 170],
@@ -43,7 +43,7 @@ const POKE: Array<[name: string, price: string, desc: string, y: number, dy: num
 /* ------------------------------------------------------ sushi burrito sticks */
 
 /** The 59:- / 99:- price block under these is part of the artwork, not text. */
-const STICKS: Array<[name: string, desc: string, y: number, dy: number]> = [
+export const STICKS: Array<[name: string, desc: string, y: number, dy: number]> = [
   ["Burrito stick Lax", "Avokado, lax", 382, 396],
   ["Burrito stick Kyckling", "Cream cheese, kyckling", 413, 428],
   ["Burrito stick Råkor", "Cream cheese, gurka, räkor", 448, 463],
@@ -53,7 +53,7 @@ const STICKS: Array<[name: string, desc: string, y: number, dy: number]> = [
 
 /* -------------------------------------------------------------------- tillägg */
 
-const TILLAGG: Array<[name: string, y: number]> = [
+export const TILLAGG: Array<[name: string, y: number]> = [
   ["CHILIMAYO", 610],
   ["MANGO CURRY SÅS", 624],
   ["AVOKADO SÅS", 637],
@@ -64,7 +64,7 @@ const TILLAGG: Array<[name: string, y: number]> = [
 /* ------------------------------------------------------------- sushi burritos */
 
 /** Price sits inline after the name with a fixed gap — that is what the print does. */
-const BURRITOS: Array<[name: string, price: string, ing: string, y: number, dy: number]> = [
+export const BURRITOS: Array<[name: string, price: string, ing: string, y: number, dy: number]> = [
   [
     "Kyckling BURRITO",
     "149:-",
@@ -126,7 +126,7 @@ const BURRITOS: Array<[name: string, price: string, ing: string, y: number, dy: 
 
 /* ------------------------------------------------------------------ lunch box */
 
-const LUNCH: Array<[n: string, rows: string[], y: number]> = [
+export const LUNCH: Array<[n: string, rows: string[], y: number]> = [
   ["1", ["6 Bitar Philadelphia Roll", "4 Bitar Maki Avokado", "4 Olika Nigiri Bitar"], 483],
   [
     "2",

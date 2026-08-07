@@ -13,6 +13,7 @@ import {
   UtensilsCrossed,
 } from "lucide-react";
 
+import { InfoBlock, InfoGrid } from "@/components/InfoBlock";
 import MobileActionBar from "@/components/MobileActionBar";
 import Reviews from "@/components/Reviews";
 import SiteFooter from "@/components/SiteFooter";
@@ -233,7 +234,7 @@ export default function Catering() {
             text at ~7.3:1, so the headline holds up wherever the photo crops to. */}
         <div className="absolute inset-0" style={{ backgroundColor: NAVY, opacity: 0.75 }} />
 
-        <div className="relative mx-auto max-w-7xl px-4 pt-14 pb-28 sm:px-6 sm:pt-24 sm:pb-40">
+        <div className="relative mx-auto max-w-7xl px-4 pt-14 pb-16 sm:px-6 sm:pt-24 sm:pb-24">
           <T
             as="p"
             k="catering.eyebrow"
@@ -279,43 +280,35 @@ export default function Catering() {
       </section>
 
       {/* ── Value props ──────────────────────────────────────────────────────
-          Lifted cards straddling the navy edge: ties the hero to the page and
-          replaces four identical grey text columns with four real objects. */}
-      <section className="relative z-10 mx-auto -mt-16 max-w-7xl px-4 sm:-mt-24 sm:px-6">
-        <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
+          No longer lifted cards: the overlap only worked because each block had
+          an opaque white fill, and these are containerless now. They sit on plain
+          white below the hero instead, separated by whitespace rather than by
+          borders. */}
+      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
+        <InfoGrid className="sm:grid-cols-2 lg:grid-cols-4">
           {valueProps.map((v) => {
             const Icon = VALUE_ICONS[v.icon as keyof typeof VALUE_ICONS] ?? Leaf;
             return (
-              <div
-                key={v.id ?? v.title}
-                className="rounded-lg border border-[#0a1f44]/10 bg-white p-6 shadow-[0_8px_30px_rgba(10,31,68,0.08)]"
-              >
-                <div
-                  className="flex h-11 w-11 items-center justify-center rounded-sm"
-                  style={{ backgroundColor: NAVY }}
-                  aria-hidden="true"
-                >
-                  <Icon className="h-5 w-5 text-white" strokeWidth={1.75} />
-                </div>
+              <InfoBlock key={v.id ?? v.title} Icon={Icon}>
                 {/* uppercase via CSS so editing writes back the stored casing. */}
                 <T
                   as="h2"
                   row={v}
                   table="catering_blocks"
                   field="title"
-                  className="mt-5 text-xs font-bold tracking-[0.14em] text-[#0a1f44] uppercase sm:text-sm"
+                  className="text-sm font-bold tracking-[0.14em] text-[#0a1f44] uppercase sm:text-base"
                 />
                 <T
                   as="p"
                   row={v}
                   table="catering_blocks"
                   field="body"
-                  className={`mt-2.5 text-sm leading-relaxed ${BODY}`}
+                  className={`mt-3 text-sm leading-relaxed sm:text-base ${BODY}`}
                 />
-              </div>
+              </InfoBlock>
             );
           })}
-        </div>
+        </InfoGrid>
       </section>
 
       {/* ── Vad vi erbjuder ──────────────────────────────────────────────────

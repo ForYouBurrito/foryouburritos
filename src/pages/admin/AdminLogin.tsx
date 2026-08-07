@@ -35,16 +35,11 @@ export default function AdminLogin() {
         onSubmit={handleSubmit}
         className="w-full max-w-sm rounded-xl border border-border bg-white p-6 shadow-sm sm:p-8"
       >
-        <p
-          className="text-2xl leading-none"
-          style={{ fontFamily: '"Blackhawk", "Arial Black", Impact, sans-serif', color: NAVY }}
+        <img src="/assets/logo.png" alt="For You Burritos" className="mx-auto block h-12 w-auto" />
+        <h1
+          className="mt-6 text-center text-xs font-bold tracking-[0.25em]"
+          style={{ color: NAVY }}
         >
-          FOR YOU{" "}
-          <span className="block" style={{ color: RED }}>
-            BURRITOS
-          </span>
-        </p>
-        <h1 className="mt-6 text-xs font-bold tracking-[0.25em]" style={{ color: NAVY }}>
           ADMIN
         </h1>
 

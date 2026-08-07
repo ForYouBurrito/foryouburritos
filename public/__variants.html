@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body { margin:0; background:#0a1f44; font-family: system-ui, sans-serif; }
+  .row { padding: 34px 60px; }
+  .label { color: rgba(255,255,255,.55); font-size: 11px; letter-spacing:.2em; margin-bottom: 14px; }
+  .wrap { position: relative; display: inline-block; }
+  .wrap img { position: relative; display:block; height: 48px; width: auto; }
+  .plate { position:absolute; pointer-events:none; }
+  .tag { color: rgba(255,255,255,.75); font-size: 14px; margin-top: 20px; max-width: 320px; }
+
+  /* A — current: rounded 24px, blur 10px, 92% */
+  .a { inset: -12px -16px; border-radius: 24px; background: rgba(255,255,255,.92); filter: blur(10px); }
+
+  /* B — crisper plate: smaller radius, tighter blur */
+  .b { inset: -12px -20px; border-radius: 12px; background: rgba(255,255,255,.94); filter: blur(7px); }
+
+  /* C — no blur; feathered by a two-axis mask so the falloff is controlled
+         independently on each axis and the wide ends stay bright */
+  .c {
+    inset: -16px -28px; background: rgba(255,255,255,.95);
+    -webkit-mask-image:
+      linear-gradient(to right, transparent 0, #000 14%, #000 86%, transparent 100%),
+      linear-gradient(to bottom, transparent 0, #000 22%, #000 78%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(to right, transparent 0, #000 14%, #000 86%, transparent 100%),
+      linear-gradient(to bottom, transparent 0, #000 22%, #000 78%, transparent 100%);
+    mask-composite: intersect;
+  }
+
+  /* D — same mask, softer and wider feather, slightly lower opacity */
+  .d {
+    inset: -18px -34px; background: rgba(255,255,255,.93); border-radius: 16px;
+    -webkit-mask-image:
+      linear-gradient(to right, transparent 0, #000 20%, #000 80%, transparent 100%),
+      linear-gradient(to bottom, transparent 0, #000 28%, #000 72%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(to right, transparent 0, #000 20%, #000 80%, transparent 100%),
+      linear-gradient(to bottom, transparent 0, #000 28%, #000 72%, transparent 100%);
+    mask-composite: intersect;
+  }
+</style>
+</head>
+<body>
+  <div class="row"><div class="label">A — rounded 24 / blur 10 / 92%</div>
+    <div class="wrap"><span class="plate a"></span><img src="/assets/logo.png"></div>
+    <div class="tag">Där tradition möter innovation i varje tugga.</div></div>
+
+  <div class="row"><div class="label">B — rounded 12 / blur 7 / 94%</div>
+    <div class="wrap"><span class="plate b"></span><img src="/assets/logo.png"></div>
+    <div class="tag">Där tradition möter innovation i varje tugga.</div></div>
+
+  <div class="row"><div class="label">C — two-axis mask feather / 95%</div>
+    <div class="wrap"><span class="plate c"></span><img src="/assets/logo.png"></div>
+    <div class="tag">Där tradition möter innovation i varje tugga.</div></div>
+
+  <div class="row"><div class="label">D — two-axis mask, wider feather / 93%</div>
+    <div class="wrap"><span class="plate d"></span><img src="/assets/logo.png"></div>
+    <div class="tag">Där tradition möter innovation i varje tugga.</div></div>
+</body>
+</html>

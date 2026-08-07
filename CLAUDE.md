@@ -106,6 +106,12 @@ floating cut-outs at a quarter of the PNG bytes — but if that section's backgr
 colour changes, the image shows its box and must be regenerated. There is no
 ImageMagick/sharp here; these were produced with `System.Drawing` from PowerShell.
 
+`poke-bowl.png` (277×277, `/meny` masthead) is the one derivative that kept its alpha
+rather than being flattened, so it is safe on any background. It was cropped from
+`plate-removebg-preview.png`, whose 338×737 canvas was 86% empty alpha — an `<img>` of
+the uncropped file reserves all that dead height. 277px is the entire asset: it is
+capped at `max-w-[277px]` and must not be rendered wider.
+
 The unused originals still ship in `dist/` (`public/` is copied wholesale) — roughly
 20 MB of dead weight. Move them out of `public/` if that matters.
 
@@ -314,7 +320,7 @@ supabase/
   generous vertical rhythm, a single large Blackhawk headline, hairline `border-border`
   rules instead of cards, one navy CTA band. Use it as the reference when converting the
   remaining sections; `/` is still the older denser layout.
-- **`/meny` sheet 01 is real text; sheet 02 is still a picture.**
+- **`/meny`: both sheets are real text over blanked artwork.**
   `src/components/MenuSheet1.tsx` lays every item, price and descriptor over
   `public/assets/Menu1_empty.png` (the printed spread with the item lines erased), so
   sheet 01 is selectable, searchable and editable in code. Editing an item = editing the
@@ -333,10 +339,30 @@ supabase/
   - To re-verify fidelity: render the component at 1024px and diff ink positions against
     `Menu1.png` (the original print, a **JPEG** despite the `.png` name).
 
-  Sheet 02 is still `public/assets/Menu2.png` — a file overwrite, no code change. It is
-  wide/dense, so the page pans it horizontally below `md` rather than shrinking it to
-  unreadable, and offers an "öppna i fullskärm" link. Sheet 01 pans too but has no such
-  link: `Menu1.png` is the *old* scan and its copy no longer matches what renders.
+- **⚠️ Every menu sheet has a second, reflowed rendering — edit the data, not one view.**
+  `src/components/MenuList.tsx` stacks the same items in one column for narrow screens.
+  It **imports the item arrays from the sheet components** and resolves every row under
+  the *same* `menu_items` slug, so the two views cannot disagree — but that only holds
+  while the copy stays in those arrays. Move an item's text into `MenuList.tsx` and you
+  have created the duplicate this design exists to avoid.
+  - The two swap at the width where that sheet's smallest type is still legible, and
+    **that width differs per sheet**: 01 needs ~860px and switches at `lg`, 02 needs
+    ~1100px (denser spread, 1440 design px against 01's 1024) and switches only at `xl`.
+    Written out as full class strings in `SHEETS`, since Tailwind scans source text and
+    would never generate `` `hidden ${bp}:block` ``.
+  - The page used to pan both sheets sideways below `md` instead. That put half of every
+    spread off-screen on a phone, and left sheet 02 unreadable on tablets too. Don't
+    reintroduce the pan container.
+  - The print's own group headings and price blocks (`POKE BOWLS`, the 59:-/99:- stick
+    block, `LUNCH BOX 119:-`, `MÅN-FRE 11-14`) are **artwork, not rows**, so they have no
+    slug to read. `MenuList` restates them as `title` / `note` — re-export a sheet and
+    they need checking by eye.
+  - Both views are in the DOM at once. The hidden sheet's artwork is a `loading="lazy"`
+    `<img>` inside `display:none`, which browsers don't fetch, so phones skip ~950 KB per
+    sheet. Swapping `hidden` for a class that keeps a layout box would silently undo that.
+  - In-place editing (`<T>`) is wired up in the **sheets only**. Two contentEditables
+    bound to one row would share a draft slot, and `/admin/edit` is used at desktop width
+    where the sheet is what renders.
 - **`/meny` needs an SPA rewrite on the host.** `vite preview` falls back to `index.html`
   automatically; a plain static host does not. Deep-linking `/meny` 404s without a
   `/* -> /index.html 200` rule.
@@ -376,6 +402,12 @@ supabase/
   public pages (`/`, `/meny`, `/catering`, `/om-oss`, `/kontakt`) do. It is `sticky`, not `fixed`,
   so it parks at the foot of the viewport while scrolling and then settles under the
   footer — no page needs compensating bottom padding.
+- **Every route change lands at the top of the page.** `src/components/ScrollToTop.tsx`
+  is rendered once inside `<BrowserRouter>` in `App.tsx` and covers all routes, so no
+  page scrolls itself. It deliberately does *not* fire on back/forward (`POP`), which
+  keeps its place, and a fragment in the URL (`/catering#offert`) wins over the top —
+  the browser only resolves fragments on a full load, so that case is handled there.
+  Same-page `<a href="#…">` links (`#offert`, `#burritos`) never reach it.
 - **`/kontakt` reads `opening_hours` as data, not just text.** Its masthead badge says
   ÖPPET NU / STÄNGT JUST NU, computed in the browser from that table in
   `Europe/Stockholm` — the day is matched by the first three letters of `day_label`

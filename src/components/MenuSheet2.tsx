@@ -60,14 +60,14 @@ const S = {
 /* ============================================================ SUSHI MENYER */
 
 /** A sub-list row; `xs` overrides the menu's column positions for that row alone. */
-type SubRow = { cells: string[]; xs?: number[] };
-type Meny = { name: string; price: string; y: number; xs: number[]; rows: SubRow[] };
+export type SubRow = { cells: string[]; xs?: number[] };
+export type Meny = { name: string; price: string; y: number; xs: number[]; rows: SubRow[] };
 
 const MENY_PRICE_RIGHT = 440;
 const MENY_SUB_OFFSET = 18;
 const MENY_SUB_PITCH = 14.5;
 
-const MENYER: Meny[] = [
+export const MENYER: Meny[] = [
   { name: "NIGIRI MENY - 6 BITAR", price: "89:-", y: 83, xs: [52], rows: [{ cells: ["Valfri"] }] },
   {
     name: "LAX MENY - 14 BITAR",
@@ -154,7 +154,7 @@ const MENYER: Meny[] = [
 
 /* ============================================================= VALFRI MENY */
 
-const VALFRI: Array<[label: string, price: string, y: number]> = [
+export const VALFRI: Array<[label: string, price: string, y: number]> = [
   ["16 bitar", "239:-", 878],
   ["20 bitar", "279:-", 899],
   ["30 bitar", "359:-", 921],
@@ -162,7 +162,7 @@ const VALFRI: Array<[label: string, price: string, y: number]> = [
 
 /* ========================================================= NIGIRI 2 BITAR */
 
-type Nigiri = {
+export type Nigiri = {
   name: string;
   price: string;
   desc: string;
@@ -175,7 +175,7 @@ type Nigiri = {
   descW?: number;
 };
 
-const NIGIRI_L: Nigiri[] = [
+export const NIGIRI_L: Nigiri[] = [
   { name: "NIGIRI SHAKE", price: "34:-", desc: "Lax", y: 66, descY: 85 },
   { name: "NIGIRI MAGURO", price: "37:-", desc: "Tuna", y: 109, descY: 128 },
   { name: "NIGIRI SURIMI", price: "32:-", desc: "Crabstick", y: 155, descY: 173 },
@@ -190,7 +190,7 @@ const NIGIRI_L: Nigiri[] = [
   },
 ];
 
-const NIGIRI_R: Nigiri[] = [
+export const NIGIRI_R: Nigiri[] = [
   { name: "NIGIRI EBI", price: "34:-", desc: "Räka", y: 66, descY: 85 },
   { name: "NIGIRI AVOKADO", price: "34:-", desc: "Avokado", y: 109, descY: 128 },
   {
@@ -206,13 +206,14 @@ const NIGIRI_R: Nigiri[] = [
 /* ====================================================== FOR YOU ROLLS 7 ST */
 
 /** The first three carry the FOR|YOU badge and a price column further left. */
-const FY_BADGED: Array<[name: string, price: string, desc: string, y: number, dy: number]> = [
-  ["SHRIMP", "94:-", "Räkor, Gurka, Cream cheese, Sesam", 320, 342],
-  ["CHICKEN", "79:-", "Kyckling, Cream cheese, Gurka, Sesam", 361, 382],
-  ["SALMON", "89:-", "Lax, Cream cheese, Gurka, Sesam", 402, 423],
-];
+export const FY_BADGED: Array<[name: string, price: string, desc: string, y: number, dy: number]> =
+  [
+    ["SHRIMP", "94:-", "Räkor, Gurka, Cream cheese, Sesam", 320, 342],
+    ["CHICKEN", "79:-", "Kyckling, Cream cheese, Gurka, Sesam", 361, 382],
+    ["SALMON", "89:-", "Lax, Cream cheese, Gurka, Sesam", 402, 423],
+  ];
 
-const FY_PLAIN: Array<[name: string, price: string, desc: string, y: number, dy: number]> = [
+export const FY_PLAIN: Array<[name: string, price: string, desc: string, y: number, dy: number]> = [
   ["FOR YOU LAX", "94:-", "Lax, Avokado, Gurka, Cream cheese, Sesam", 447, 465],
   ["FOR YOU TUNA", "94:-", "Tonfisk, Gurka, Sesam, Cream cheese", 487, 504],
   ["FOR YOU VEGETARISK", "79:-", "Avokado, Gurka, Cream cheese", 529, 546],
@@ -220,7 +221,7 @@ const FY_PLAIN: Array<[name: string, price: string, desc: string, y: number, dy:
 
 /* =================================================== INSIDE-OUT ROLLS 8 ST */
 
-type IoCell = {
+export type IoCell = {
   name: string;
   price: string;
   desc: string;
@@ -230,9 +231,9 @@ type IoCell = {
   /** the print sets the longer right-column names smaller so they clear the price */
   nameSize?: number;
 };
-type IoRow = { y: number; descY: number; c1: IoCell; c2?: IoCell };
+export type IoRow = { y: number; descY: number; c1: IoCell; c2?: IoCell };
 
-const INSIDE: IoRow[] = [
+export const INSIDE: IoRow[] = [
   {
     y: 656,
     descY: 673,
@@ -351,46 +352,49 @@ const INSIDE: IoRow[] = [
 /* ======================================================== DELUX ROLLS 8 ST */
 
 /** Item 1's descriptor wraps early to stay clear of the photo above it. */
-const DELUX: Array<[name: string, price: string, desc: string, y: number, dy: number, w: number]> =
+export const DELUX: Array<
+  [name: string, price: string, desc: string, y: number, dy: number, w: number]
+> = [
   [
-    [
-      "TEMPURA DELUX",
-      "135:-",
-      "Friterad Räka, Avokado, Gurka Topping: Flamberad Lax, Teriyakisås, Chilimayo, Sesam",
-      82,
-      99,
-      258,
-    ],
-    [
-      "CHICKEN DELUX",
-      "119:-",
-      "Kyckling, Cream cheese, Gurka. Topping: Avokado, Teriyakisås, Chilimayo",
-      150,
-      168,
-      345,
-    ],
-    [
-      "SPICY SALMON ROLL",
-      "125:-",
-      "Lax, Avokado, Gurka Topping: Flamberad Lax, Japansk Mayo, Chilipeppar, siracha sås",
-      210,
-      227,
-      345,
-    ],
-    [
-      "TEMPURA ROYAL",
-      "135:-",
-      "Friterad Räka, gurka Topping: Avokado, Chilli Mayo, Teriyakisås, sesam",
-      278,
-      297,
-      345,
-    ],
-  ];
+    "TEMPURA DELUX",
+    "135:-",
+    "Friterad Räka, Avokado, Gurka Topping: Flamberad Lax, Teriyakisås, Chilimayo, Sesam",
+    82,
+    99,
+    258,
+  ],
+  [
+    "CHICKEN DELUX",
+    "119:-",
+    "Kyckling, Cream cheese, Gurka. Topping: Avokado, Teriyakisås, Chilimayo",
+    150,
+    168,
+    345,
+  ],
+  [
+    "SPICY SALMON ROLL",
+    "125:-",
+    "Lax, Avokado, Gurka Topping: Flamberad Lax, Japansk Mayo, Chilipeppar, siracha sås",
+    210,
+    227,
+    345,
+  ],
+  [
+    "TEMPURA ROYAL",
+    "135:-",
+    "Friterad Räka, gurka Topping: Avokado, Chilli Mayo, Teriyakisås, sesam",
+    278,
+    297,
+    345,
+  ],
+];
 
 /* =========================================================== MAKI 6 BITAR */
 
 /** `dy === null` means the descriptor sits inline after the name, as the print does. */
-const MAKI: Array<[name: string, price: string, desc: string, y: number, dy: number | null]> = [
+export const MAKI: Array<
+  [name: string, price: string, desc: string, y: number, dy: number | null]
+> = [
   ["MAKI AVOKADO", "49:-", "Avokado", 404, null],
   ["MAKI CHICKEN", "45:-", "Kyckling, Cream Cheese", 441, 460],
   ["MAKI EBI", "55:-", "Räkor", 492, null],
@@ -402,7 +406,7 @@ const MAKI: Array<[name: string, price: string, desc: string, y: number, dy: num
 
 /* ============================================================== TILLBEHÖR */
 
-type Till = {
+export type Till = {
   name: string;
   desc?: string;
   y: number;
@@ -413,7 +417,7 @@ type Till = {
   tiers?: Array<[qty: string, price: string, right: number]>;
 };
 
-const TILL: Till[] = [
+export const TILL: Till[] = [
   {
     name: "VÅRRULLAR",
     price: "49:-",

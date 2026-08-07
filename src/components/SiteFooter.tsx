@@ -7,6 +7,49 @@ import { NAVY } from "@/lib/site";
 
 const logo = "/assets/logo.png";
 
+/**
+ * Feathers the logo's backing wash out on both axes independently.
+ *
+ * A radial gradient is the obvious tool and the wrong one here: the wordmark is
+ * ~4.5:1, so an ellipse that fades within its box leaves the far ends of
+ * "BURRITOS" — and its corners especially — in shadow while the middle stays
+ * bright. Two linear masks intersected hold a flat plateau across the whole
+ * mark and fall off only past it, which is why the wash has no edge anywhere
+ * yet the black letters sit on near-white from the B to the S.
+ *
+ * The falloff is in px, not %, and is the padding either side of the mark. A
+ * percentage falloff is measured against the box, so it reaches inside the logo
+ * and dims the outer letters — and by a different amount at every breakpoint,
+ * since the logo changes height.
+ *
+ * It is asymmetric because the space is. The logo starts at the footer's own
+ * page gutter, so there is nothing to the left of it to fade into: `--fl` is
+ * capped at exactly that gutter (16px, 24px at sm) so the wash reaches zero
+ * precisely at the screen edge and runs off it. Any wider and it is sliced
+ * mid-fade, leaving a hard vertical edge down the side of the mark on phones.
+ * The left fade is therefore run 16px *into* the mark to buy a longer ramp than
+ * the gutter alone allows; it costs the "B" a slightly less bright backing and
+ * is well worth it. To the right the column is empty, so `--fr` takes a long
+ * fade there — which is what stops the whole thing reading as a plate.
+ *
+ * No border-radius on purpose either: a radius clips the mask's low-alpha tail
+ * mid-falloff, and that cut reads as a faint rounded rectangle floating on the
+ * navy — the exact boxed-in look this is avoiding. The mask alone shapes it.
+ */
+const MASK =
+  "linear-gradient(to right, transparent 0, #000 calc(var(--fl) + 16px), #000 calc(100% - var(--fr)), transparent 100%)," +
+  "linear-gradient(to bottom, transparent 0, #000 28px, #000 calc(100% - 28px), transparent 100%)";
+
+const FEATHER = {
+  left: "calc(var(--fl) * -1)",
+  right: "calc(var(--fr) * -1)",
+  insetBlock: "-28px",
+  maskImage: MASK,
+  maskComposite: "intersect",
+  WebkitMaskImage: MASK,
+  WebkitMaskComposite: "source-in",
+} as const;
+
 const isInternal = (href: string) => href.startsWith("/") || href.startsWith("#");
 
 /** Column heading — one shared treatment so the four columns line up exactly. */
@@ -55,8 +98,27 @@ export default function SiteFooter({ seamless = false }: { seamless?: boolean })
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:grid-cols-2 sm:px-6 sm:py-16 lg:grid-cols-4 lg:gap-12">
         {/* Brand */}
         <div className="lg:pr-6">
-          <Link to="/" className="inline-block">
-            <img src={logo} alt="For You Burritos" className="h-10 w-auto sm:h-12" />
+          <Link to="/" className="relative inline-block">
+            {/*
+              The wordmark is "B[FOR YOU]URRITOS": the boxed FOR YOU is knocked
+              out in white, but BURRITOS is solid black with a light halo — it
+              was drawn for white paper and disappears completely on navy.
+
+              So the mark is given light to sit in rather than a card to sit on.
+              See FEATHER above for why the falloff is two linear masks and not
+              a radial gradient.
+
+              Not z-indexed: both children are positioned with z-index auto, so
+              they paint in DOM order and the mark lands on top. A negative
+              z-index here would drop the wash behind the footer's own
+              background and hide it.
+            */}
+            <span
+              aria-hidden="true"
+              style={FEATHER}
+              className="pointer-events-none absolute [--fl:16px] [--fr:52px] bg-white/[0.88] sm:[--fl:24px] sm:[--fr:88px]"
+            />
+            <img src={logo} alt="For You Burritos" className="relative h-10 w-auto sm:h-12" />
           </Link>
           <T
             as="p"

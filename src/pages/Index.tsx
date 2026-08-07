@@ -17,10 +17,11 @@ import { NAVY, RED } from "@/lib/site";
 
 // Served straight from public/assets/ — drop the real files in there and they
 // appear at these URLs. See public/assets/README.md for the exact filenames.
-// 1098x908 — exactly 2x the old hero2.png, so it renders at the same size but
-// stays sharp on retina. Display size comes from the classes on the <img>
-// (w-full / max-w-xs), never from the intrinsic pixels.
-const hero = "/assets/hero2bg_upscayl_2x_remacri-4x.png";
+// 500x500 — a plated shot on its own white ground (not a transparent cutout
+// like the old hero2bg), so it sits directly on the page's white background.
+// Display size comes from the classes on the <img> (w-full / max-w-xs), never
+// from the intrinsic pixels.
+const hero = "/assets/hero2bg.png";
 // The shopfront, from the same derivative /om-oss uses for its intro slot — the
 // `omoss-` prefix is just where it was first generated, not where it belongs.
 // 229 KB against the 9.3 MB original it was cut from.
@@ -141,8 +142,8 @@ export default function Index() {
             <img
               src={hero}
               alt="Sushi burrito"
-              width={1098}
-              height={908}
+              width={500}
+              height={500}
               decoding="async"
               className="mx-auto w-full max-w-xs scale-110 sm:max-w-none"
             />

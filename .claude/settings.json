@@ -3,7 +3,29 @@
     "allow": [
       "Bash(npx tsc *)",
       "Bash(npm run *)",
-      "Bash(npx eslint *)"
+      "Bash(npx eslint *)",
+      "Bash(echo \"=== tsc exit: $? ===\")",
+      "Bash(node -e ' *)",
+      "Bash(npx vite *)",
+      "PowerShell(npm run typecheck 2>&1)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(git add *)",
+      "Bash(gh repo *)",
+      "Bash(gh auth *)",
+      "Bash(bash \"C:/Users/2hej0/AppData/Local/Temp/claude/c--Users-2hej0-Downloads-customer-YouBurrito-FYBCodebase/974f92d8-4c7c-4239-b48c-4925dc7d5a78/scratchpad/deploy-preview.sh\")",
+      "PowerShell(npm run typecheck)",
+      "Bash(bash -n scripts/deploy-preview.sh)",
+      "Bash(git commit -q -m ' *)",
+      "Bash(node -e \"const p=require\\('./package.json'\\);console.log\\(Object.keys\\({...p.dependencies,...p.devDependencies}\\).filter\\(d=>/playwright|puppeteer|vitest|jsdom/i.test\\(d\\)\\).join\\('\\\\n'\\)||'none'\\)\")",
+      "Bash(awk '{print $5, $9}')",
+      "Bash(curl -sS --max-time 180 \"https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=https%3A%2F%2Fforyouburrito.github.io%2F&strategy=mobile&category=performance\" -o /tmp/psi.json -w \"http %{http_code}  in %{time_total}s\\\\n\")",
+      "Bash(bash -n /tmp/vitals.sh)",
+      "Bash(git pull *)",
+      "PowerShell(\"--- AdminSeo exists? ---\")",
+      "PowerShell(npx eslint src/components/ScrollToTop.tsx src/App.tsx 2>&1)",
+      "PowerShell(npx eslint src/main.tsx 2>&1)",
+      "PowerShell(\"=== baseline: a file I did not touch ===\")"
     ]
   }
 }

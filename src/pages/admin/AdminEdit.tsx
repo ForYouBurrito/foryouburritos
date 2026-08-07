@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Check, Loader2, LogOut, Search, SlidersHorizontal } from "lucide-react";
 
 import KeepAliveWarning from "@/components/admin/KeepAliveWarning";
-import { useSession } from "@/lib/auth";
+import { signOut, useSession } from "@/lib/auth";
 import { EditProvider, saveDrafts, useEditing } from "@/lib/editing";
 import { NAVY, RED } from "@/lib/site";
 import Catering from "@/pages/Catering";
@@ -122,13 +122,14 @@ function EditToolbar({ page }: { page: PageKey }) {
             {saved && <Check className="h-3 w-3" />}
             {saved ? "SPARAT" : `SPARA${count ? ` (${count})` : ""}`}
           </button>
-          <Link
-            to="/admin/login"
+          <button
+            type="button"
+            onClick={signOut}
             aria-label="Logga ut"
             className="rounded-sm p-1.5 text-white/70 transition hover:text-white"
           >
             <LogOut className="h-3.5 w-3.5" />
-          </Link>
+          </button>
         </div>
       </div>
     </div>

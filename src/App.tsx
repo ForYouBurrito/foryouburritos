@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
+import ScrollToTop from "./components/ScrollToTop";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminEdit from "./pages/admin/AdminEdit";
 import AdminLogin from "./pages/admin/AdminLogin";
@@ -18,6 +19,8 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        {/* Every route change starts at the top of the page. */}
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/meny" element={<Meny />} />

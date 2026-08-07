@@ -33,11 +33,9 @@ import { NAVY, RED } from "@/lib/site";
  *   Öppettider  -> a departure board, with today's row picked out live
  *   Besöka oss  -> the storefront photo itself, address set in Blackhawk over it
  *
- * The masthead is flat navy rather than a tinted photo. /om-oss and /catering
- * both open on a tinted photo; this page's one photograph is the shopfront, and
- * it earns more as the "Besöka oss" tile than as a 72%-obscured backdrop. To put
- * a photo back, restore an <img> + tint pair inside the hero section — nothing
- * else depends on it.
+ * The masthead opens on a tinted photo, same as /om-oss and /catering. It is a
+ * different photograph from the shopfront further down the page — that one is
+ * shown as itself in the "Besöka oss" tile and would read as a repeat here.
  *
  * The page holds no copy of its own. Every string comes from `site_content`
  * under the `kontakt.` prefix and is wrapped in <T> so it is editable in place at
@@ -52,6 +50,11 @@ import { NAVY, RED } from "@/lib/site";
  */
 
 const shopfront = { src: "/assets/omoss-butik.jpg", width: 1200, height: 1059 };
+
+// Derived from the client's IMG_8906 at 1800px/q74, the same recipe as
+// /assets/omoss-hero.jpg. It sits under a heavy navy tint, so it can take more
+// compression than an image shown as itself.
+const heroBg = { src: "/assets/kontakt-hero.jpg", width: 1800, height: 1010 };
 
 const DISPLAY = { fontFamily: '"Blackhawk", "Arial Black", Impact, sans-serif' } as const;
 const BODY = "text-[#0a1f44]/70";
@@ -222,11 +225,24 @@ export default function Kontakt() {
       <SiteHeader />
 
       {/* ── Masthead ──────────────────────────────────────────────────────────
-          Flat navy and pure type. The live status sits directly under the
-          headline: the first thing a visitor to a contact page wants to know is
-          whether anyone is there right now. */}
-      <section style={{ backgroundColor: NAVY }}>
-        <div className="mx-auto max-w-7xl px-4 pt-14 pb-16 sm:px-6 sm:pt-24 sm:pb-28">
+          A food shot under a 75% navy tint, then pure type over it — the same
+          construction and the same tint as the /om-oss hero, deliberately, so
+          the three inner pages open identically. The live status sits directly
+          under the headline: the first thing a visitor to a contact page wants
+          to know is whether anyone is there right now. */}
+      <section className="relative isolate overflow-hidden" style={{ backgroundColor: NAVY }}>
+        <img
+          src={heroBg.src}
+          alt=""
+          width={heroBg.width}
+          height={heroBg.height}
+          fetchPriority="high"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0" style={{ backgroundColor: NAVY, opacity: 0.75 }} />
+
+        <div className="relative mx-auto max-w-7xl px-4 pt-14 pb-16 sm:px-6 sm:pt-24 sm:pb-28">
           <T as="p" k="kontakt.eyebrow" className={`${EYEBROW} text-white/70`} />
           <div
             className="mt-6 h-1.5 w-16 sm:w-24"

@@ -76,7 +76,11 @@
       "Bash(PYTHONIOENCODING=utf-8 python -c ' *)",
       "Bash(grep -vE '^\\(version|name\\)$')",
       "Bash(sed -i \"s/values \\('0010', 'meny_catering'\\)/values \\('0011', 'meny_catering'\\)/\" supabase/migrations/0011_meny_catering.sql)",
-      "Bash(sed -i \"s|-- Run in SQL Editor after 0009.|-- Run in SQL Editor after 0010_kontakt.sql.|\" supabase/migrations/0011_meny_catering.sql)"
+      "Bash(sed -i \"s|-- Run in SQL Editor after 0009.|-- Run in SQL Editor after 0010_kontakt.sql.|\" supabase/migrations/0011_meny_catering.sql)",
+      "PowerShell(\"---STAGED?---\")",
+      "PowerShell(\"---settings.json---\")",
+      "PowerShell(git --no-pager diff --cached --name-status | Format-Table -AutoSize; \"=== not staged / untracked ===\"; git status --porcelain | Where-Object { $_ -match '^\\(\\\\?\\\\?|.[MD]\\)' })",
+      "Bash(node -e \"const m=require\\('./content-backup/schema_migrations.json'\\); console.log\\(m.map\\(r=>r.version+' '+r.name\\).join\\('\\\\n'\\)\\)\")"
     ]
   }
 }
