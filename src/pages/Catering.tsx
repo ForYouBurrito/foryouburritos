@@ -25,7 +25,7 @@ import {
   hasCateringWebhook,
   sendCateringRequest,
 } from "@/lib/catering-webhook";
-import { useCateringBlocks } from "@/lib/cms";
+import { useCateringBlocks, useContact } from "@/lib/cms";
 import { T } from "@/lib/editing";
 import { CONTACT, NAVY, RED } from "@/lib/site";
 
@@ -163,6 +163,7 @@ type SubmitStatus = "idle" | "sending" | "sent" | "mailto";
 const VALUE_ICONS = { Leaf, UtensilsCrossed, SlidersHorizontal, Sparkles } as const;
 
 export default function Catering() {
+  const contact = useContact();
   const valueProps = useCateringBlocks("varden");
   const offerings = useCateringBlocks("erbjudanden");
   const steps = useCateringBlocks("process");
@@ -276,10 +277,10 @@ export default function Catering() {
               <T k="catering.cta_quote_label" /> <ArrowRight className="h-4 w-4" />
             </a>
             <a
-              href={`tel:${CONTACT.phoneHref}`}
+              href={`tel:${contact.phoneHref}`}
               className="inline-flex min-h-11 items-center justify-center gap-2 rounded-sm border border-white/25 px-6 text-xs font-bold tracking-[0.15em] text-white transition hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1f44] focus-visible:outline-none sm:min-h-14 sm:text-sm"
             >
-              <Phone className="h-3.5 w-3.5" strokeWidth={2} /> {CONTACT.phone}
+              <Phone className="h-3.5 w-3.5" strokeWidth={2} /> {contact.phone}
             </a>
           </div>
         </div>
