@@ -3,10 +3,14 @@ import { Navigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 
 import { signIn, useSession } from "@/lib/auth";
+import { useImage } from "@/lib/cms";
 import { NAVY, RED } from "@/lib/site";
 
 export default function AdminLogin() {
   const { session, loading } = useSession();
+  // Read before the early returns below — a hook after them would not run on
+  // every render.
+  const logo = useImage("brand.logo_image", "/assets/logo.png");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +39,10 @@ export default function AdminLogin() {
         onSubmit={handleSubmit}
         className="w-full max-w-sm rounded-xl border border-border bg-white p-6 shadow-sm sm:p-8"
       >
-        <img src="/assets/logo.png" alt="For You Burritos" className="mx-auto block h-12 w-auto" />
+        {/* Reads the CMS logo so a replaced one shows here too, but is not
+            editable: nobody is signed in on this page, so an upload could only
+            be rejected by RLS. */}
+        <img src={logo} alt="For You Burritos" className="mx-auto block h-12 w-auto" />
         <h1
           className="mt-6 text-center text-xs font-bold tracking-[0.25em]"
           style={{ color: NAVY }}

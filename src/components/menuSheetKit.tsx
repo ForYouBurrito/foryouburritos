@@ -1,5 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 
+import EditableImage from "@/components/EditableImage";
+
 /**
  * Shared primitives for the printed menu sheets rebuilt as real text
  * (`MenuSheet1`, `MenuSheet2`).
@@ -134,13 +136,27 @@ export function makeSheetKit(W: number, H: number) {
     );
   }
 
-  /** The scaling frame + the blanked artwork behind it. */
+  /**
+   * The scaling frame + the blanked artwork behind it.
+   *
+   * ⚠️ The artwork is replaceable, but it is the one image on the site where a
+   * careless swap breaks the page rather than just looking different. Every
+   * item, price and descriptor is positioned as a PERCENTAGE of this frame, so
+   * a replacement must have the same layout and proportions as the file it
+   * replaces — a different photo leaves the text floating over nothing.
+   *
+   * `loading="lazy"` matters here beyond the usual: the sheet that is hidden at
+   * the current width sits inside `display:none`, which browsers decline to
+   * fetch, so phones skip ~950 KB per sheet. EditableImage passes it through.
+   */
   function Frame({
     src,
+    imageKey,
     className = "",
     children,
   }: {
     src: string;
+    imageKey?: string;
     className?: string;
     children: ReactNode;
   }) {
@@ -149,14 +165,17 @@ export function makeSheetKit(W: number, H: number) {
         className={"relative w-full select-text " + className}
         style={{ aspectRatio: `${W} / ${H}`, containerType: "inline-size" }}
       >
-        <img
-          src={src}
+        <EditableImage
+          variant="corner"
+          imageKey={imageKey}
+          fallback={src}
           alt=""
-          aria-hidden="true"
+          ariaHidden
           width={W}
           height={H}
           loading="lazy"
           decoding="async"
+          hint="OBS: texten ligger placerad ovanpå bilden. En ersättare måste ha exakt samma mått och layout."
           className="absolute inset-0 h-full w-full"
         />
         {children}

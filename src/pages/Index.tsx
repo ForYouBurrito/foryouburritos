@@ -100,6 +100,13 @@ export default function Index() {
               (clamp, tied to vw) instead, since the column is half-width there
               too. break-words is the backstop: if a word still doesn't fit, it
               wraps mid-word instead of spilling into the image column. */}
+          {/* Tagline lives in this same column, right after the h1, rather than
+              being its own grid row — a separate row would anchor its position
+              to the bottom of row 1, which the (taller) image stretches tall,
+              opening a dead gap between the headline and the tagline that has
+              nothing to do with either element's own spacing. Keeping it here
+              means the gap is just the tagline's own mt-5, same as before this
+              was ever split into rows. */}
           <div className="min-w-0">
             <h1 className="leading-[0.85] break-words" style={DISPLAY}>
               <T
@@ -113,9 +120,20 @@ export default function Index() {
                 />
               </span>
             </h1>
+
+            {/* whitespace-pre-line: the CMS stores the line break as \n, not markup. */}
+            <T
+              as="p"
+              k="hero.tagline"
+              className="mt-5 whitespace-pre-line break-words text-[clamp(0.85rem,3vw,1.1rem)] font-semibold tracking-wide text-[#0a1f44] sm:mt-7 sm:text-[1.375rem]"
+            />
           </div>
 
-          <div className="min-w-0 sm:row-span-4">
+          {/* row-span-3 (not 4): the grid below sm: now only has 3 rows —
+              headline+tagline together, the CTA row, and the menu link — so
+              this is what needs to span to sit beside the whole text stack at
+              sm: and up, same as row-span-4 did before the tagline moved. */}
+          <div className="min-w-0 sm:row-span-3">
             <EditableImage
               imageKey="hero.background_image"
               fallback={hero}
@@ -128,13 +146,6 @@ export default function Index() {
               className="block h-full w-auto max-w-full rounded-xl sm:h-auto sm:w-full sm:max-w-none sm:scale-110 sm:rounded-none"
             />
           </div>
-
-          {/* whitespace-pre-line: the CMS stores the line break as \n, not markup. */}
-          <T
-            as="p"
-            k="hero.tagline"
-            className="col-span-2 mt-5 min-w-0 whitespace-pre-line break-words text-[clamp(0.85rem,3vw,1.1rem)] font-semibold tracking-wide text-[#0a1f44] sm:col-span-1 sm:mt-7 sm:text-[1.375rem]"
-          />
 
           <div className="col-span-2 mt-7 flex min-w-0 flex-row flex-wrap items-center gap-3 sm:col-span-1 sm:mt-9">
             <a
@@ -231,11 +242,16 @@ export default function Index() {
               className="group min-w-0 overflow-hidden rounded-xl bg-[#0a1f44] shadow-[0_8px_30px_rgba(10,31,68,0.14)] transition hover:shadow-[0_14px_40px_rgba(10,31,68,0.28)]"
             >
               <div className="relative aspect-[4/3] overflow-hidden">
-                <img
-                  src={c.image_url}
+                <EditableImage
+                  variant="corner"
+                  row={c}
+                  table="menu_categories"
+                  field="image_url"
+                  fallback={c.image_url}
                   alt={c.title}
                   loading="lazy"
                   decoding="async"
+                  hint="Liggande bild, 4:3 — texten läggs över nederkanten"
                   className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.04]"
                 />
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#0a1f44] via-[#0a1f44]/70 to-transparent px-4 pt-12 pb-4">
@@ -337,9 +353,11 @@ export default function Index() {
         </div>
 
         {/* No top margin on the map: a white gap here would cut the photo band
-            away from it, and the two are one navy block now. */}
+            away from it, and the two are one navy block now.
+            hidden below sm: SiteFooter now carries its own CAROLI map band on
+            mobile, so this one would otherwise repeat directly above it. */}
         {mainLocation && (
-          <div className="relative">
+          <div className="relative hidden sm:block">
             <iframe
               title={`${mainLocation.name} karta`}
               src={`https://www.google.com/maps?q=${encodeURIComponent(mainLocation.map_query)}&output=embed`}

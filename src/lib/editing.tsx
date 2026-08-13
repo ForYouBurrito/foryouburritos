@@ -40,15 +40,18 @@ type EditContextValue = {
   setDraft: (target: Target, value: string) => void;
   clearDrafts: () => void;
   /**
-   * Writes a site_content value immediately, outside the draft bar. Returns an
-   * error message, or null on success.
+   * Writes one value immediately, outside the draft bar. Returns an error
+   * message, or null on success.
    *
    * Only images use this. By the time an upload returns a URL the file is
    * already in Storage, so holding the reference back as an unsaved draft would
    * risk an orphaned object nobody could find if the owner navigated away.
    * Text has no such cost, which is why it still batches.
+   *
+   * Takes a Target rather than a key because not every image is a site_content
+   * row — the three menu cards are `menu_categories.image_url`.
    */
-  saveImage: (key: string, url: string) => Promise<string | null>;
+  saveImage: (target: Target, url: string) => Promise<string | null>;
 };
 
 const EditContext = createContext<EditContextValue | null>(null);
@@ -68,21 +71,29 @@ export function EditProvider({ children }: { children: React.ReactNode }) {
   const clearDrafts = useCallback(() => setDrafts({}), []);
 
   const saveImage = useCallback(
-    async (key: string, url: string): Promise<string | null> => {
+    async (target: Target, url: string): Promise<string | null> => {
       if (!supabase) return "Supabase är inte konfigurerad.";
 
-      const { data, error } = await supabase
-        .from("site_content")
-        .update({ value: url })
-        .eq("key", key)
-        .select("key");
+      const { data, error } =
+        "key" in target
+          ? await supabase
+              .from("site_content")
+              .update({ value: url })
+              .eq("key", target.key)
+              .select("key")
+          : await supabase
+              .from(target.table)
+              .update({ [target.field]: url })
+              .eq("id", target.id)
+              .select("id");
 
       if (error) return error.message;
       // Same zero-rows trap as saveDrafts: Postgres does not error when an
       // UPDATE matches nothing, so a slot whose migration has not been applied
       // would report success and quietly drop the new image.
       if (!data || data.length === 0) {
-        return `Bildplatsen "${key}" finns inte i databasen än — kör migration 0020.`;
+        const what = "key" in target ? target.key : `${target.table}.${target.field}`;
+        return `Bildplatsen "${what}" finns inte i databasen än — kör migrationen som lägger till den.`;
       }
 
       await queryClient.invalidateQueries({ queryKey: ["cms"] });

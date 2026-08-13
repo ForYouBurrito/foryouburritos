@@ -491,7 +491,7 @@ export default function MenuSheet2({ className = "" }: { className?: string }) {
     items.get(slug) ?? { slug, name, price, description };
 
   return (
-    <Frame src="/assets/Menu2_canvas.png" className={className}>
+    <Frame src="/assets/Menu2_canvas.png" imageKey="meny.sheet2_artwork" className={className}>
       {/* SUSHI MENYER ----------------------------------------------------- */}
       {MENYER.map((m, mi) => {
         const it = slot(`s2.menyer.${mi + 1}`, m.name, m.price);

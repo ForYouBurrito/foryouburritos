@@ -219,6 +219,12 @@ const FALLBACK_CONTENT: Record<string, string> = {
   "catering.poke_image": "/assets/omoss-poke.jpg",
   "omoss.hero_image": "/assets/omoss-hero.jpg",
   "brand.logo_image": "/assets/logo.png",
+
+  // The menu sheet backgrounds (0021). Replaceable, but only by artwork with
+  // the same layout — every item and price on /meny is positioned as a
+  // percentage of these. See the migration for why.
+  "meny.sheet1_artwork": "/assets/Menu1_empty.png",
+  "meny.sheet2_artwork": "/assets/Menu2_canvas.png",
 };
 
 const FALLBACK_FEATURES: FeatureTileRow[] = [

@@ -2,7 +2,7 @@ import { useId, useRef, useState } from "react";
 import { ImageUp, Loader2 } from "lucide-react";
 
 import { useImage } from "@/lib/cms";
-import { useEditing } from "@/lib/editing";
+import { useEditing, type Target } from "@/lib/editing";
 import { formatBytes, uploadImage } from "@/lib/upload";
 
 /**
@@ -34,8 +34,19 @@ import { formatBytes, uploadImage } from "@/lib/upload";
  * beside it, positioned against the section that was already there.
  */
 export type EditableImageProps = {
-  /** site_content key holding the override, e.g. "hero.background_image". */
-  imageKey: string;
+  /**
+   * site_content key holding the override, e.g. "hero.background_image".
+   * Mutually exclusive with row/table/field.
+   */
+  imageKey?: string;
+  /**
+   * A row from a content table whose column holds the URL — the three menu
+   * cards are `menu_categories.image_url`. Must carry its `id` to be editable;
+   * a fallback row has no database row behind it, so it correctly is not.
+   */
+  row?: { id?: string } & Record<string, unknown>;
+  table?: string;
+  field?: string;
   /** The file in public/assets/ this slot renders when nothing is stored. */
   fallback: string;
   alt: string;
@@ -57,6 +68,9 @@ export type EditableImageProps = {
 
 export default function EditableImage({
   imageKey,
+  row,
+  table,
+  field,
   fallback,
   alt,
   className,
@@ -71,9 +85,22 @@ export default function EditableImage({
   variant = "overlay",
 }: EditableImageProps) {
   const ctx = useEditing();
-  const src = useImage(imageKey, fallback);
   const inputRef = useRef<HTMLInputElement>(null);
   const inputId = useId();
+
+  // Hooks cannot be called conditionally, so the site_content read always runs.
+  // It is a no-op for table-backed slots: useImage falls straight through to
+  // the fallback when given no key.
+  const keyed = useImage(imageKey ?? "", fallback);
+  const fromRow = field ? String(row?.[field] ?? "") : "";
+  const src = imageKey ? keyed : fromRow || fallback;
+
+  // Only a row that exists in the database can be written back to.
+  const target: Target | null = imageKey
+    ? { key: imageKey }
+    : row?.id && table && field
+      ? { table, id: row.id, field }
+      : null;
 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -84,12 +111,13 @@ export default function EditableImage({
   const [replaced, setReplaced] = useState<string | null>(null);
 
   async function handleFile(file: File) {
+    if (!target) return;
     setBusy(true);
     setError(null);
     setNote(null);
 
     const before = file.size;
-    const result = await uploadImage(file, imageKey);
+    const result = await uploadImage(file, imageKey ?? `${table}-${field}`);
 
     if ("error" in result) {
       setError(result.error);
@@ -97,9 +125,9 @@ export default function EditableImage({
       return;
     }
 
-    // Storage now holds the file; site_content must point at it or the upload
+    // Storage now holds the file; the database must point at it or the upload
     // is both invisible and orphaned.
-    const saveError = await ctx?.saveImage(imageKey, result.url);
+    const saveError = await ctx?.saveImage(target, result.url);
     if (saveError) {
       setError(saveError);
       setBusy(false);
@@ -126,7 +154,10 @@ export default function EditableImage({
     />
   );
 
-  if (!ctx?.editing) return img;
+  // No target means fallback content with no row behind it — there is nothing
+  // to write to, so it renders as a plain image rather than offering an upload
+  // that would silently fail.
+  if (!ctx?.editing || !target) return img;
 
   const picker = (
     <input

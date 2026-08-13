@@ -48,16 +48,25 @@ function RedRule({ className = "" }: { className?: string }) {
   );
 }
 
-/** Optional per-section media. Renders nothing until a URL is set in the CMS. */
+/**
+ * Optional per-section media. Renders nothing until a URL is set in the CMS —
+ * these three slots are genuinely optional, unlike the layout images elsewhere,
+ * so clearing one removes the picture rather than falling back to a file.
+ *
+ * That is also why it cannot simply pass `fallback`: there is no default file
+ * here. Once a URL exists the slot becomes replaceable in place like the rest.
+ */
 function SectionImage({ k, alt }: { k: string; alt: string }) {
   const src = useAboutImage(k);
   if (!src) return null;
   return (
-    <img
-      src={src}
+    <EditableImage
+      imageKey={k}
+      fallback={src}
       alt={alt}
       loading="lazy"
       decoding="async"
+      hint="Visas i full bredd i den här sektionen"
       className="block h-auto w-full rounded-lg object-cover"
     />
   );

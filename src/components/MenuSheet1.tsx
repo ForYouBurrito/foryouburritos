@@ -148,7 +148,7 @@ export default function MenuSheet1({ className = "" }: { className?: string }) {
     items.get(slug) ?? { slug, name, price, description };
 
   return (
-    <Frame src="/assets/Menu1_empty.png" className={className}>
+    <Frame src="/assets/Menu1_empty.png" imageKey="meny.sheet1_artwork" className={className}>
       {/* POKE BOWLS ------------------------------------------------------- */}
       <Txt x={43} y={61} w={213} size={10.2} lh={11.6}>
         <T
