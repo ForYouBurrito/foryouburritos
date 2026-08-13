@@ -10,7 +10,7 @@ export default function AdminLogin() {
   const { session, loading } = useSession();
   // Read before the early returns below — a hook after them would not run on
   // every render.
-  const logo = useImage("brand.logo_image", "/assets/logo.png");
+  const logo = useImage("brand.logo_header", "/assets/logo.png");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);

@@ -218,7 +218,11 @@ const FALLBACK_CONTENT: Record<string, string> = {
   "catering.hero_image": "/assets/varma.png",
   "catering.poke_image": "/assets/omoss-poke.jpg",
   "omoss.hero_image": "/assets/omoss-hero.jpg",
-  "brand.logo_image": "/assets/logo.png",
+  // Two keys, not one (0022). The header mark sits on white at 36-48px; the
+  // footer mark sits on navy under a feathered wash, in two lockups. One key
+  // meant replacing either changed both.
+  "brand.logo_header": "/assets/logo.png",
+  "brand.logo_footer": "/assets/logo.png",
 
   // The menu sheet backgrounds (0021). Replaceable, but only by artwork with
   // the same layout — every item and price on /meny is positioned as a

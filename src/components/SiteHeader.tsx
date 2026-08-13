@@ -57,11 +57,11 @@ export default function SiteHeader() {
             to breathe again — the cap just stops it being the thing that overflows. */}
         <Link to="/" className="min-w-0 shrink">
           <EditableImage
-            imageKey="brand.logo_image"
+            imageKey="brand.logo_header"
             fallback={logo}
             alt="For You Burritos"
             loading="eager"
-            hint="Bred logotyp — höjden är låst, så en kvadratisk bild blir liten"
+            hint="Sidhuvudets logotyp på alla sidor. Bred bild — höjden är låst, så en kvadratisk blir liten"
             className="h-9 w-auto max-w-[60vw] object-contain object-left sm:h-12 sm:max-w-none"
           />
         </Link>
