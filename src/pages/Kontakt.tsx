@@ -576,8 +576,10 @@ export default function Kontakt() {
           Same construction as "/": the address sits in a navy gradient rising off
           the bottom edge, in the footer's exact #0a1f44, so the band and the
           footer read as one continuous block. pointer-events-none keeps the map
-          pannable everywhere except the text itself. */}
-      <section className="relative">
+          pannable everywhere except the text itself.
+          hidden below sm: SiteFooter now carries its own CAROLI map band on
+          mobile, so this one would otherwise repeat directly above it. */}
+      <section className="relative hidden sm:block">
         <iframe
           title={t("kontakt.map_title")}
           src={`https://www.google.com/maps?q=${encodeURIComponent(mapAddress)}&output=embed`}

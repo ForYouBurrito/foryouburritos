@@ -6,14 +6,7 @@ import { useContact, useLocations, useNavLinks, useOpeningHours } from "@/lib/cm
 import { T } from "@/lib/editing";
 import { NAVY } from "@/lib/site";
 
-const logo = "/assets/logo.png";
-
-/**
- * Plain backing plate behind the logo — no fade, just a solid rectangle
- * padded out from the mark so the wordmark's black letters (drawn for white
- * paper, invisible on navy) have something light to sit on.
- */
-const LOGO_PLATE = "absolute -inset-x-4 -inset-y-3 bg-white/[0.88]";
+const logo = "/assets/Footer_logo_white.png";
 
 const isInternal = (href: string) => href.startsWith("/") || href.startsWith("#");
 
@@ -81,7 +74,7 @@ export default function SiteFooter({ seamless = false }: { seamless?: boolean })
           <iframe
             title={`${mainLocation.name} karta`}
             src={`https://www.google.com/maps?q=${encodeURIComponent(mainLocation.map_query)}&output=embed`}
-            className="block h-40 w-full border-0"
+            className="block h-28 w-full border-0"
             loading="lazy"
           />
           {/* Same navy gradient as the page map bands, rising off the bottom edge
@@ -105,18 +98,14 @@ export default function SiteFooter({ seamless = false }: { seamless?: boolean })
           brand column below, just re-wrapped so it isn't left-anchored; the
           three-column row (Öppettider/Hör av dig/Snabblänkar) for mobile is
           added by a later piece. */}
-      <div className="flex flex-col items-center px-4 pt-14 text-center sm:hidden">
+      <div className="flex flex-col items-center px-4 pt-10 text-center sm:hidden">
         <Link to="/" className="relative inline-block">
-          {/* Centered lockup, so unlike the desktop span below there's no gutter
-              forcing --fl to stay small — equal fl/fr keeps the wash's midpoint
-              on the logo's midpoint instead of dragging it toward BURRITOS. */}
-          <span aria-hidden="true" className={`pointer-events-none ${LOGO_PLATE}`} />
           <EditableImage
             imageKey="brand.logo_footer"
             fallback={logo}
             alt="For You Burritos"
-            hint="Sidfotens logotyp på alla sidor. Ligger på marinblå botten under en ljus tonad platta"
-            className="relative h-10 w-auto sm:h-12"
+            hint="Sidfotens logotyp på alla sidor. Ligger direkt på marinblå botten"
+            className="h-10 w-auto sm:h-12"
           />
         </Link>
         <T
@@ -132,7 +121,7 @@ export default function SiteFooter({ seamless = false }: { seamless?: boolean })
           below. Only column 1 (Öppettider) is populated so far — columns 2
           and 3 are filled in by later pieces; grid-cols-3 alone reserves
           their width in the meantime. */}
-      <div className="sm:hidden grid grid-cols-3 gap-4 px-4">
+      <div className="sm:hidden mt-24 mb-14 grid grid-cols-3 gap-4 px-4">
         {/* Öppettider */}
         <div>
           <ColHeading k="footer.hours_heading" />
@@ -166,16 +155,23 @@ export default function SiteFooter({ seamless = false }: { seamless?: boolean })
         {/* Hör av dig — same three rows as the desktop column further below,
             duplicated rather than shared/moved (see the Brand and Öppettider
             pieces for why). */}
-        <div>
+        <div className="min-w-0">
           <ColHeading k="footer.contact_heading" />
           <ul className="mt-5 space-y-1 text-xs text-white/75 sm:text-sm">
             <li>
+              {/* min-w-0 on the link plus break-all on the email span keep this
+                  row inside its 1fr grid track. Without them the anonymous flex
+                  item wrapping the unbroken "info@foryouburritos.se" string (no
+                  spaces to wrap on) refuses to shrink below its full text width,
+                  which widens this column past its third and overlaps the
+                  Snabblänkar links beside it. Phone/address have spaces to wrap
+                  on already, so they don't need this. */}
               <a
                 href={`mailto:${contact.email}`}
-                className="flex min-h-9 items-start gap-2.5 py-1 transition hover:text-white"
+                className="flex min-h-9 min-w-0 items-start gap-2.5 py-1 transition hover:text-white"
               >
                 <Mail className="mt-0.5 h-3.5 w-3.5 shrink-0" strokeWidth={1.5} />
-                {contact.email}
+                <span className="min-w-0 break-all">{contact.email}</span>
               </a>
             </li>
             <li>
@@ -200,31 +196,48 @@ export default function SiteFooter({ seamless = false }: { seamless?: boolean })
             </li>
           </ul>
         </div>
+
+        {/* Snabblänkar — same four links as the desktop column further below,
+            duplicated rather than shared/moved (see the Brand and Öppettider
+            pieces for why). The nowrap wrapper is needed only here: at ~108px
+            this grid column is narrower than "SNABBLÄNKAR" set in
+            ColHeading's shared tracking-[0.25em] bold-caps treatment, and the
+            global `h2 { overflow-wrap: break-word }` rule in index.css (meant
+            for long addresses/compounds) otherwise breaks it mid-word
+            ("SNABBLÄNKA" / "R") instead of overflowing. whitespace-nowrap
+            keeps it on one baseline like ÖPPETTIDER/HÖR AV DIG without
+            touching ColHeading's own styling. */}
+        <div>
+          <div className="whitespace-nowrap">
+            <ColHeading k="footer.links_heading" />
+          </div>
+          {/* Same overflow-wrap problem hits the longest link ("KONTAKTA
+              OSS") as hits the heading above it — the column is narrower
+              than the label at this tracking/weight, so index.css's
+              `h2 { overflow-wrap: break-word }`-style wrapping (applied
+              here via the browser's default text wrap) breaks it mid-phrase
+              instead of overflowing. whitespace-nowrap keeps every link on
+              one baseline, matching ÖPPETTIDER/HÖR AV DIG's rhythm. Scoped
+              to this mobile nav only — FooterLink itself is shared with the
+              desktop column and must not change. */}
+          <nav className="mt-5 whitespace-nowrap">
+            {navLinks.map((l) => (
+              <FooterLink key={l.label} href={l.href} label={l.label} />
+            ))}
+          </nav>
+        </div>
       </div>
 
       <div className="hidden sm:grid mx-auto max-w-7xl gap-10 px-4 py-14 sm:grid-cols-2 sm:px-6 sm:py-16 lg:grid-cols-4 lg:gap-12">
         {/* Brand */}
         <div className="lg:pr-6">
           <Link to="/" className="relative inline-block">
-            {/*
-              The wordmark is "B[FOR YOU]URRITOS": the boxed FOR YOU is knocked
-              out in white, but BURRITOS is solid black with a light halo — it
-              was drawn for white paper and disappears completely on navy.
-
-              So the mark is given light to sit in rather than a card to sit on.
-
-              Not z-indexed: both children are positioned with z-index auto, so
-              they paint in DOM order and the mark lands on top. A negative
-              z-index here would drop the plate behind the footer's own
-              background and hide it.
-            */}
-            <span aria-hidden="true" className={`pointer-events-none ${LOGO_PLATE}`} />
             <EditableImage
               imageKey="brand.logo_footer"
               fallback={logo}
               alt="For You Burritos"
-              hint="Sidfotens logotyp på alla sidor. Ligger på marinblå botten under en ljus tonad platta"
-              className="relative h-10 w-auto sm:h-12"
+              hint="Sidfotens logotyp på alla sidor. Ligger direkt på marinblå botten"
+              className="h-10 w-auto sm:h-12"
             />
           </Link>
           <T
