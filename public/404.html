@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>For You Burritos</title>
+    <!--
+      GitHub Pages has no server-side rewrite rule, so a deep link like
+      /meny hits this 404.html directly. This is the standard SPA-on-GH-Pages
+      redirect trick (https://github.com/rafgraph/spa-github-pages): encode the
+      real path into a query string, redirect to /, and index.html's inline
+      script below decodes it back before react-router-dom ever mounts.
+      pathSegmentsToKeep is 0 because this is a custom-domain project site
+      (foryouburritos.se), not a github.io/<repo>/ path.
+    -->
+    <script>
+      var pathSegmentsToKeep = 0;
+      var l = window.location;
+      l.replace(
+        l.protocol + "//" + l.hostname + (l.port ? ":" + l.port : "") +
+        l.pathname.split("/").slice(0, 1 + pathSegmentsToKeep).join("/") + "/?/" +
+        l.pathname.slice(1).split("/").slice(pathSegmentsToKeep).join("/").replace(/&/g, "~and~") +
+        (l.search ? "&" + l.search.slice(1).replace(/&/g, "~and~") : "") +
+        l.hash
+      );
+    </script>
+  </head>
+  <body></body>
+</html>

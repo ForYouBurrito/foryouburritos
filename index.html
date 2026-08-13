@@ -28,6 +28,32 @@
       content="Japanese precision. Mexican vibes. Beställ online eller besök oss i Malmö och Lund."
     />
     <meta name="twitter:image" content="/assets/og-image.png" />
+
+    <!--
+      Counterpart to public/404.html's redirect trick — GitHub Pages has no
+      server-side rewrite, so a deep link like /meny bounces through 404.html
+      as /?/meny and lands here. This decodes it back to a real path via
+      history.replaceState before react-router-dom mounts and reads the URL.
+      No-op on every other host, and a no-op here too once ?/ isn't present.
+    -->
+    <script>
+      (function (l) {
+        if (l.search[1] === "/") {
+          var decoded = l.search
+            .slice(1)
+            .split("&")
+            .map(function (s) {
+              return s.replace(/~and~/g, "&");
+            })
+            .join("?");
+          window.history.replaceState(
+            null,
+            null,
+            l.pathname.slice(0, -1) + decoded + l.hash
+          );
+        }
+      })(window.location);
+    </script>
   </head>
   <body>
     <div id="root"></div>
