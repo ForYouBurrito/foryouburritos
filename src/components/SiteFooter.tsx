@@ -159,13 +159,18 @@ export default function SiteFooter({ seamless = false }: { seamless?: boolean })
           <ColHeading k="footer.contact_heading" />
           <ul className="mt-5 space-y-1 text-xs text-white/75 sm:text-sm">
             <li>
-              {/* min-w-0 on the link plus break-all on the email span keep this
-                  row inside its 1fr grid track. Without them the anonymous flex
-                  item wrapping the unbroken "info@foryouburritos.se" string (no
-                  spaces to wrap on) refuses to shrink below its full text width,
-                  which widens this column past its third and overlaps the
-                  Snabblänkar links beside it. Phone/address have spaces to wrap
-                  on already, so they don't need this. */}
+              {/* min-w-0 on the link plus break-all on the span keep this row
+                  inside its 1fr grid track. Without them the anonymous flex
+                  item wrapping an unbroken string (no spaces to wrap on)
+                  refuses to shrink below its full text width, which widens
+                  this column past its third and overlaps the Snabblänkar
+                  links beside it — and since that pushes the whole 3-col grid
+                  wider than the viewport, the entire page becomes
+                  horizontally pannable, not just this column. Applies to both
+                  email and phone: the CMS-editable phone number isn't
+                  guaranteed to be space-separated like the site.ts fallback
+                  ("+46 431 31 14 14") — the live value is "+46765213077",
+                  one unbroken run of digits. */}
               <a
                 href={`mailto:${contact.email}`}
                 className="flex min-h-9 min-w-0 items-start gap-2.5 py-1 transition hover:text-white"
@@ -177,10 +182,10 @@ export default function SiteFooter({ seamless = false }: { seamless?: boolean })
             <li>
               <a
                 href={`tel:${contact.phoneHref}`}
-                className="flex min-h-9 items-start gap-2.5 py-1 transition hover:text-white"
+                className="flex min-h-9 min-w-0 items-start gap-2.5 py-1 transition hover:text-white"
               >
                 <Phone className="mt-0.5 h-3.5 w-3.5 shrink-0" strokeWidth={1.5} />
-                {contact.phone}
+                <span className="min-w-0 break-all">{contact.phone}</span>
               </a>
             </li>
             <li>
@@ -295,10 +300,10 @@ export default function SiteFooter({ seamless = false }: { seamless?: boolean })
             <li>
               <a
                 href={`tel:${contact.phoneHref}`}
-                className="flex min-h-9 items-start gap-2.5 py-1 transition hover:text-white"
+                className="flex min-h-9 min-w-0 items-start gap-2.5 py-1 transition hover:text-white"
               >
                 <Phone className="mt-0.5 h-3.5 w-3.5 shrink-0" strokeWidth={1.5} />
-                {contact.phone}
+                <span className="min-w-0 break-all">{contact.phone}</span>
               </a>
             </li>
             <li>
