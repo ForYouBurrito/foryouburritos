@@ -13,6 +13,10 @@ export const ORDER_HEADER =
 
 export const MENU_LINK = "https://foryouburritos.se/";
 
+/** Where every review card links out to — the business's Google reviews. */
+export const GOOGLE_REVIEWS_URL =
+  "https://www.google.com/search?sxsrf=APpeQnuNKyOr3NAy6HpI6zqbrueCGoKGXw:1786621705408&uds=AJ5uw1_a2D0D09lxm8gpKKOTUn4rt9LlPgvY2Q4B3GVnBpQ9H-XvomMwB1-mBhXPYoa4SQN4AnaLHhY3yKBBnzSzcClkYtby9qEkkKF8K5o99wQIcB-ZLHg0ZiUOqARMc1fzoCuK_ATm4OKHkBu9fRH89VKtZPC9GsE40kqGSbx0Mn7Nnk6rD_o&q=For+You+Burritos+Reviews&si=APenkKm7iecQ4G6P-TsbSMFKIQtv3EFIqRAFw-i8uEbk55Z-_x9i9xCkcByB76zLJUI4r4kkLKGMfBqBgWwPrJ9_QtPFBP-n1dkV8pexEtWhTveW1P9GEB1CJrZ3pFVwHb07WFI7nLdlxikghtivnWEyO8mgZ-q4BA%3D%3D&hl=en-SE";
+
 /** The line under the wordmark, everywhere it appears. */
 export const TAGLINE = "Där tradition möter innovation i varje tugga.";
 

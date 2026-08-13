@@ -2,6 +2,7 @@ import { Star } from "lucide-react";
 
 import { useTestimonials } from "@/lib/cms";
 import { T } from "@/lib/editing";
+import { GOOGLE_REVIEWS_URL } from "@/lib/site";
 
 /**
  * Google reviews, shared by "/", "/catering" and "/om-oss".
@@ -58,38 +59,43 @@ export default function Reviews({ className = "" }: { className?: string }) {
 
         <ul className="mt-10 grid gap-4 sm:mt-14 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
           {testimonials.map((r, i) => (
-            <li
-              key={r.id ?? i}
-              className="flex flex-col rounded-lg border border-[#0a1f44]/10 bg-white p-6 shadow-[0_8px_30px_rgba(10,31,68,0.06)] sm:p-7"
-            >
-              <Stars rating={r.rating} />
+            <li key={r.id ?? i}>
+              <a
+                href={GOOGLE_REVIEWS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Läs fler recensioner på Google"
+                className="flex h-full flex-col rounded-lg border border-[#0a1f44]/10 bg-white p-6 shadow-[0_8px_30px_rgba(10,31,68,0.06)] transition hover:shadow-[0_10px_36px_rgba(10,31,68,0.10)] sm:p-7"
+              >
+                <Stars rating={r.rating} />
 
-              {/* blockquote, because these are attributed words — not our copy. */}
-              <blockquote className="mt-5">
-                <T
-                  row={r}
-                  table="testimonials"
-                  field="quote"
-                  className={`block text-sm leading-relaxed sm:text-base ${BODY}`}
-                />
-              </blockquote>
+                {/* blockquote, because these are attributed words — not our copy. */}
+                <blockquote className="mt-5">
+                  <T
+                    row={r}
+                    table="testimonials"
+                    field="quote"
+                    className={`block text-sm leading-relaxed sm:text-base ${BODY}`}
+                  />
+                </blockquote>
 
-              {/* mt-auto pins attribution to the card floor, so the names line up
-                  across quotes that run from four words to four lines. */}
-              <div className="mt-auto pt-6">
-                <T
-                  row={r}
-                  table="testimonials"
-                  field="author"
-                  className="block text-sm font-bold text-[#0a1f44] sm:text-base"
-                />
-                <T
-                  row={r}
-                  table="testimonials"
-                  field="source"
-                  className="mt-1 block text-xs text-[#0a1f44]/55"
-                />
-              </div>
+                {/* mt-auto pins attribution to the card floor, so the names line up
+                    across quotes that run from four words to four lines. */}
+                <div className="mt-auto pt-6">
+                  <T
+                    row={r}
+                    table="testimonials"
+                    field="author"
+                    className="block text-sm font-bold text-[#0a1f44] sm:text-base"
+                  />
+                  <T
+                    row={r}
+                    table="testimonials"
+                    field="source"
+                    className="mt-1 block text-xs text-[#0a1f44]/55"
+                  />
+                </div>
+              </a>
             </li>
           ))}
         </ul>
