@@ -31,6 +31,13 @@ jobs:
         run: npm ci
 
       - name: Build
+        env:
+          # Vite bakes these into the bundle at build time — without them here,
+          # src/lib/supabase.ts falls back to a null client and the admin login
+          # fails with "Supabase är inte konfigurerad." on the deployed site
+          # even though a local .env works fine. Anon key is public by design.
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
         run: npm run build
 
       - name: Upload Pages artifact
