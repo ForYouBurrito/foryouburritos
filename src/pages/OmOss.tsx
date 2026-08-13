@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react";
 
+import EditableImage from "@/components/EditableImage";
 import MobileActionBar from "@/components/MobileActionBar";
 import Reviews from "@/components/Reviews";
 import SiteFooter from "@/components/SiteFooter";
@@ -79,13 +80,18 @@ export default function OmOss() {
           ties the two pages together. Shorter here, and with no CTA row: this
           page is not selling, it is introducing. */}
       <section className="relative isolate overflow-hidden" style={{ backgroundColor: NAVY }}>
-        <img
-          src={heroBg.src}
+        <EditableImage
+          variant="corner"
+          imageKey="omoss.hero_image"
+          fallback={heroBg.src}
           alt=""
+          ariaHidden
           width={heroBg.width}
           height={heroBg.height}
+          loading="eager"
           fetchPriority="high"
           decoding="async"
+          hint="Liggande bild — ligger under en mörk ton"
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0" style={{ backgroundColor: NAVY, opacity: 0.75 }} />

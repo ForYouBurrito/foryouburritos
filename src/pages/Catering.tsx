@@ -13,6 +13,7 @@ import {
   UtensilsCrossed,
 } from "lucide-react";
 
+import EditableImage from "@/components/EditableImage";
 import { InfoBlock, InfoGrid } from "@/components/InfoBlock";
 import MobileActionBar from "@/components/MobileActionBar";
 import Reviews from "@/components/Reviews";
@@ -222,12 +223,17 @@ export default function Catering() {
           the way a top-down plate on white marble would. The extra bottom padding
           is the runway the value-prop cards overlap into. */}
       <section className="relative isolate overflow-hidden" style={{ backgroundColor: NAVY }}>
-        <img
-          src={heroBg}
+        <EditableImage
+          variant="corner"
+          imageKey="catering.hero_image"
+          fallback={heroBg}
           alt=""
+          ariaHidden
           width={1920}
           height={1077}
+          loading="eager"
           decoding="async"
+          hint="Liggande bild — ligger under en mörk ton"
           className="absolute inset-0 h-full w-full object-cover"
         />
         {/* The tint. 75% navy over the image's brightest region still leaves white
@@ -359,13 +365,15 @@ export default function Catering() {
                 object-contain and no rounding, so the bowl sits directly on the
                 #f6f6f4 band with nothing boxing it in. */}
             <div className="hidden lg:col-span-5 lg:block">
-              <img
-                src={pokeBowl.src}
+              <EditableImage
+                imageKey="catering.poke_image"
+                fallback={pokeBowl.src}
                 alt="Poke bowl från For You Burritos"
                 width={pokeBowl.width}
                 height={pokeBowl.height}
                 loading="lazy"
                 decoding="async"
+                hint="Sitter direkt på den ljusa bakgrunden — ingen ram"
                 className="sticky top-28 h-auto w-full object-contain"
               />
             </div>

@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Fish, Flame, Hand, Phone, UtensilsCrossed } from "lucide-react";
 
+import EditableImage from "@/components/EditableImage";
 import MobileActionBar from "@/components/MobileActionBar";
 import Reviews from "@/components/Reviews";
 import SiteFooter from "@/components/SiteFooter";
@@ -17,11 +18,14 @@ import { NAVY, RED } from "@/lib/site";
 
 // Served straight from public/assets/ — drop the real files in there and they
 // appear at these URLs. See public/assets/README.md for the exact filenames.
-// 500x500 — a plated shot on its own white ground (not a transparent cutout
-// like the old hero2bg), so it sits directly on the page's white background.
-// Display size comes from the classes on the <img> (w-full / max-w-xs), never
-// from the intrinsic pixels.
-const hero = "/assets/hero2bg.png";
+// hero2bg-tight.png is hero2bg.png (500x500) cropped to the plate's actual
+// content — the source has ~21% fully transparent padding above and below the
+// plate, which renders invisibly against the white page and is easy to miss by
+// eye, but breaks anything that top-aligns the image against text next to it
+// (the padding is real empty space the layout has to account for). Top edge is
+// cropped exactly to the plate's first opaque pixel — no padding — since the
+// hero pairs this image top-edge-to-top-edge with the headline. 457x296.
+const hero = "/assets/hero2bg-tight.png";
 // The shopfront, from the same derivative /om-oss uses for its intro slot — the
 // `omoss-` prefix is just where it was first generated, not where it belongs.
 // 229 KB against the 9.3 MB original it was cut from.
@@ -79,75 +83,89 @@ export default function Index() {
           site exists to get an order or a call, so those are now the two buttons
           and "vår meny" steps back to a text link. */}
       <section className="mx-auto max-w-7xl px-4 pt-10 pb-12 sm:px-6 sm:pt-16 sm:pb-20">
-        <div className="grid grid-cols-1 items-center gap-8 sm:grid-cols-2 sm:gap-10">
-          {/* The headline needs the full column width: a display face at this size
-              overflows a half-width grid cell and drags the page wider than the
-              viewport. */}
+        {/* Below sm: only the headline shares a row with the photo (each is a
+            separate grid item, not one wrapping div) — items-stretch makes that
+            row's height the headline's own height, and h-full/w-auto on the img
+            (no object-cover) sizes the square photo off that height with its
+            aspect ratio intact, so it never needs cropping. Tagline/CTAs/link
+            each span both columns on their own row below. gap-y-0 leaves the
+            vertical rhythm to each element's own mt-*, same as when they were
+            flow siblings in one div; gap-x is the only real gap.
+            At sm: the photo takes sm:row-span-4 to sit beside all four text
+            rows again — reproducing the original single-column-of-text /
+            single-image layout exactly, just built from separate grid items. */}
+        <div className="grid grid-cols-2 items-stretch gap-x-4 gap-y-0 sm:items-center sm:gap-x-10">
+          {/* The headline needs the full column width at sm+: a display face at
+              that size overflows a half-width grid cell. Below sm: it's fluid
+              (clamp, tied to vw) instead, since the column is half-width there
+              too. break-words is the backstop: if a word still doesn't fit, it
+              wraps mid-word instead of spilling into the image column. */}
           <div className="min-w-0">
-            <h1 className="leading-[0.85]" style={DISPLAY}>
+            <h1 className="leading-[0.85] break-words" style={DISPLAY}>
               <T
                 k="hero.title_line1"
-                className="block text-[4.125rem] text-black sm:text-[4.95rem] md:text-[6.6rem]"
+                className="block text-[clamp(1.6rem,8.5vw,4.125rem)] text-black sm:text-[4.95rem] md:text-[6.6rem]"
               />
               <span className="block" style={{ color: RED }}>
                 <T
                   k="hero.title_line2"
-                  className="block text-[4.125rem] sm:text-[4.95rem] md:text-[6.6rem]"
+                  className="block text-[clamp(1.6rem,8.5vw,4.125rem)] sm:text-[4.95rem] md:text-[6.6rem]"
                 />
               </span>
             </h1>
-
-            {/* whitespace-pre-line: the CMS stores the line break as \n, not markup. */}
-            <T
-              as="p"
-              k="hero.tagline"
-              className="mt-5 whitespace-pre-line text-[1.1rem] font-semibold tracking-wide text-[#0a1f44] sm:mt-7 sm:text-[1.375rem]"
-            />
-
-            <div className="mt-7 flex flex-col gap-3 sm:mt-9 sm:flex-row sm:flex-wrap sm:items-center">
-              <a
-                href={t("header.cta_url")}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ backgroundColor: RED }}
-                className={btnRed}
-              >
-                <T k="hero.cta_order_label" /> <ArrowRight className="h-4 w-4" />
-              </a>
-              {/* The second half of the goal. Icon only — the number is carried by
-                  the href, and printing it as a label made a wide button that
-                  competed with the order CTA next to it. aria-label and title keep
-                  it announced and hoverable, so nothing is lost by dropping it. */}
-              <a
-                href={`tel:${contact.phoneHref}`}
-                aria-label={`Ring oss på ${contact.phone}`}
-                title={contact.phone}
-                className={btnIconOutline}
-              >
-                <Phone className="h-5 w-5" strokeWidth={2} />
-              </a>
-            </div>
-
-            <Link
-              to="/meny"
-              className="mt-5 inline-flex items-center gap-1.5 text-xs font-bold tracking-[0.15em] text-[#0a1f44] underline-offset-4 transition hover:underline sm:text-sm"
-            >
-              <T k="hero.cta_menu_label" /> <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
           </div>
 
-          <div className="min-w-0">
-            {/* +10%: scaled rather than widened, so the grid track keeps its
-                measured width and the headline column can't be squeezed. */}
-            <img
-              src={hero}
+          <div className="min-w-0 sm:row-span-4">
+            <EditableImage
+              imageKey="hero.background_image"
+              fallback={hero}
               alt="Sushi burrito"
-              width={500}
-              height={500}
+              width={457}
+              height={296}
+              loading="eager"
               decoding="async"
-              className="mx-auto w-full max-w-xs scale-110 sm:max-w-none"
+              hint="Liggande bild — visas bredvid rubriken"
+              className="block h-full w-auto max-w-full rounded-xl sm:h-auto sm:w-full sm:max-w-none sm:scale-110 sm:rounded-none"
             />
           </div>
+
+          {/* whitespace-pre-line: the CMS stores the line break as \n, not markup. */}
+          <T
+            as="p"
+            k="hero.tagline"
+            className="col-span-2 mt-5 min-w-0 whitespace-pre-line break-words text-[clamp(0.85rem,3vw,1.1rem)] font-semibold tracking-wide text-[#0a1f44] sm:col-span-1 sm:mt-7 sm:text-[1.375rem]"
+          />
+
+          <div className="col-span-2 mt-7 flex min-w-0 flex-row flex-wrap items-center gap-3 sm:col-span-1 sm:mt-9">
+            <a
+              href={t("header.cta_url")}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ backgroundColor: RED }}
+              className={btnRed}
+            >
+              <T k="hero.cta_order_label" /> <ArrowRight className="h-4 w-4" />
+            </a>
+            {/* The second half of the goal. Icon only — the number is carried by
+                the href, and printing it as a label made a wide button that
+                competed with the order CTA next to it. aria-label and title keep
+                it announced and hoverable, so nothing is lost by dropping it. */}
+            <a
+              href={`tel:${contact.phoneHref}`}
+              aria-label={`Ring oss på ${contact.phone}`}
+              title={contact.phone}
+              className={btnIconOutline}
+            >
+              <Phone className="h-5 w-5" strokeWidth={2} />
+            </a>
+          </div>
+
+          <Link
+            to="/meny"
+            className="col-span-2 mt-5 inline-flex min-w-0 items-center gap-1.5 text-xs font-bold tracking-[0.15em] text-[#0a1f44] underline-offset-4 transition hover:underline sm:col-span-1 sm:text-sm"
+          >
+            <T k="hero.cta_menu_label" /> <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
         </div>
       </section>
 
@@ -270,14 +288,17 @@ export default function Index() {
             object-cover crops it to whatever the copy needs in height, and the
             navy wash carries it into the map + footer below. aria-hidden with an
             empty alt — the section heading already says what this is. */}
-        <img
-          src={storefront.src}
+        <EditableImage
+          variant="corner"
+          imageKey="hero.storefront_image"
+          fallback={storefront.src}
           alt=""
-          aria-hidden="true"
+          ariaHidden
           width={storefront.width}
           height={storefront.height}
           loading="lazy"
           decoding="async"
+          hint="Bakgrundsbild — ligger under en mörk ton"
           className="absolute inset-0 -z-10 h-full w-full object-cover object-center"
         />
         {/* Solid enough that white type clears AA over the photo's bright patches

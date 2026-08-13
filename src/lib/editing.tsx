@@ -23,6 +23,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { useContent } from "./cms";
 import { supabase } from "./supabase";
@@ -38,6 +39,16 @@ type EditContextValue = {
   drafts: Record<string, { target: Target; value: string }>;
   setDraft: (target: Target, value: string) => void;
   clearDrafts: () => void;
+  /**
+   * Writes a site_content value immediately, outside the draft bar. Returns an
+   * error message, or null on success.
+   *
+   * Only images use this. By the time an upload returns a URL the file is
+   * already in Storage, so holding the reference back as an unsaved draft would
+   * risk an orphaned object nobody could find if the owner navigated away.
+   * Text has no such cost, which is why it still batches.
+   */
+  saveImage: (key: string, url: string) => Promise<string | null>;
 };
 
 const EditContext = createContext<EditContextValue | null>(null);
@@ -48,6 +59,7 @@ export function useEditing() {
 
 export function EditProvider({ children }: { children: React.ReactNode }) {
   const [drafts, setDrafts] = useState<EditContextValue["drafts"]>({});
+  const queryClient = useQueryClient();
 
   const setDraft = useCallback((target: Target, value: string) => {
     setDrafts((d) => ({ ...d, [targetId(target)]: { target, value } }));
@@ -55,9 +67,33 @@ export function EditProvider({ children }: { children: React.ReactNode }) {
 
   const clearDrafts = useCallback(() => setDrafts({}), []);
 
+  const saveImage = useCallback(
+    async (key: string, url: string): Promise<string | null> => {
+      if (!supabase) return "Supabase är inte konfigurerad.";
+
+      const { data, error } = await supabase
+        .from("site_content")
+        .update({ value: url })
+        .eq("key", key)
+        .select("key");
+
+      if (error) return error.message;
+      // Same zero-rows trap as saveDrafts: Postgres does not error when an
+      // UPDATE matches nothing, so a slot whose migration has not been applied
+      // would report success and quietly drop the new image.
+      if (!data || data.length === 0) {
+        return `Bildplatsen "${key}" finns inte i databasen än — kör migration 0020.`;
+      }
+
+      await queryClient.invalidateQueries({ queryKey: ["cms"] });
+      return null;
+    },
+    [queryClient],
+  );
+
   const value = useMemo(
-    () => ({ editing: true, drafts, setDraft, clearDrafts }),
-    [drafts, setDraft, clearDrafts],
+    () => ({ editing: true, drafts, setDraft, clearDrafts, saveImage }),
+    [drafts, setDraft, clearDrafts, saveImage],
   );
 
   return <EditContext.Provider value={value}>{children}</EditContext.Provider>;

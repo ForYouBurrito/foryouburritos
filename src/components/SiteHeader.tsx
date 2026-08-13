@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Menu, Phone, X } from "lucide-react";
 
+import EditableImage from "@/components/EditableImage";
 import { useContact, useContent, useNavLinks } from "@/lib/cms";
 import { T } from "@/lib/editing";
 import { NAVY, RED } from "@/lib/site";
@@ -55,9 +56,12 @@ export default function SiteHeader() {
             to the bottom bar it only shares the row with the burger, so it gets room
             to breathe again — the cap just stops it being the thing that overflows. */}
         <Link to="/" className="min-w-0 shrink">
-          <img
-            src={logo}
+          <EditableImage
+            imageKey="brand.logo_image"
+            fallback={logo}
             alt="For You Burritos"
+            loading="eager"
+            hint="Bred logotyp — höjden är låst, så en kvadratisk bild blir liten"
             className="h-9 w-auto max-w-[60vw] object-contain object-left sm:h-12 sm:max-w-none"
           />
         </Link>

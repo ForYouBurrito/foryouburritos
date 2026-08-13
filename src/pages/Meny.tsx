@@ -1,5 +1,6 @@
 import { ArrowRight, Clock, Info } from "lucide-react";
 
+import EditableImage from "@/components/EditableImage";
 import { InfoBlock, InfoGrid } from "@/components/InfoBlock";
 import { MenuList1, MenuList2 } from "@/components/MenuList";
 import MenuSheet1 from "@/components/MenuSheet1";
@@ -106,13 +107,18 @@ export default function Meny() {
           Kept shorter than theirs on purpose: on this page the menu is the point,
           so the fold should land on the first sheet, not on the headline. */}
       <section className="relative isolate overflow-hidden" style={{ backgroundColor: NAVY }}>
-        <img
-          src={heroBg.src}
+        <EditableImage
+          variant="corner"
+          imageKey="meny.hero_image"
+          fallback={heroBg.src}
           alt=""
+          ariaHidden
           width={heroBg.width}
           height={heroBg.height}
+          loading="eager"
           fetchPriority="high"
           decoding="async"
+          hint="Liggande bild — ligger under en mörk ton"
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0" style={{ backgroundColor: NAVY, opacity: 0.75 }} />
@@ -173,13 +179,15 @@ export default function Meny() {
               than that, and stretching it would only show them. The shadow is
               what separates a dark bowl rim from the navy behind it. */}
           <div className="hidden lg:col-span-5 lg:block">
-            <img
-              src={pokeBowl.src}
+            <EditableImage
+              imageKey="meny.masthead_image"
+              fallback={pokeBowl.src}
               alt="Poke bowl med tonfisk, avokado, mango, gurka och rödlök"
               width={pokeBowl.width}
               height={pokeBowl.height}
               loading="lazy"
               decoding="async"
+              hint="Urklippt bild med genomskinlig bakgrund fungerar bäst här"
               className="mx-auto block h-auto w-full max-w-[277px] drop-shadow-[0_28px_50px_rgba(0,0,0,0.5)]"
             />
           </div>

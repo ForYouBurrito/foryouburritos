@@ -201,6 +201,24 @@ const FALLBACK_CONTENT: Record<string, string> = {
   "omoss.intro_image": "/assets/omoss-butik.jpg",
   "omoss.philosophy_image": "/assets/omoss-poke.jpg",
   "omoss.vision_image": "/assets/omoss-sushi.jpg",
+
+  // Owner-replaceable images (0020). Each holds the path the page already
+  // rendered, so applying that migration changed nothing on screen — the value
+  // only moves to a Supabase Storage URL once a replacement is uploaded.
+  //
+  // These matter more than most fallbacks: they are what visitors see before
+  // the fetch resolves, so a stale entry here is a visible flash of the OLD
+  // photo on every cold load. Keep them in step with 0020.
+  "hero.background_image": "/assets/hero2bg-tight.png",
+  "hero.storefront_image": "/assets/omoss-butik.jpg",
+  "meny.hero_image": "/assets/IMG_8906-scaled.jpg",
+  "meny.masthead_image": "/assets/poke-bowl.png",
+  "kontakt.hero_image": "/assets/kontakt-hero.jpg",
+  "kontakt.shopfront_image": "/assets/omoss-butik.jpg",
+  "catering.hero_image": "/assets/varma.png",
+  "catering.poke_image": "/assets/omoss-poke.jpg",
+  "omoss.hero_image": "/assets/omoss-hero.jpg",
+  "brand.logo_image": "/assets/logo.png",
 };
 
 const FALLBACK_FEATURES: FeatureTileRow[] = [
@@ -535,6 +553,23 @@ export const useTestimonials = (): TestimonialRow[] =>
 export function useAboutImage(key: string): string | null {
   const value = useContent()(key);
   return value.startsWith("/") || value.startsWith("http") ? value : null;
+}
+
+/**
+ * A replaceable image slot (0020).
+ *
+ * Differs from useAboutImage in what "no value" means. There, an empty slot is
+ * a legitimate choice — the section renders without a picture. Here the image
+ * is part of the layout, so an empty value must fall back to the file shipped
+ * in public/assets/ rather than leaving a hole.
+ *
+ * `fallback` is that file. useContent() resolves an unknown key to the key
+ * name itself, so anything not URL-shaped is treated as absent — which also
+ * covers the window before the migration has been applied.
+ */
+export function useImage(key: string, fallback: string): string {
+  const value = useContent()(key);
+  return value.startsWith("/") || value.startsWith("http") ? value : fallback;
 }
 
 /** Contact details, with the `tel:` href derived so only one value needs editing. */

@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Mail, MapPin, Phone } from "lucide-react";
 
+import EditableImage from "@/components/EditableImage";
 import { useContact, useNavLinks, useOpeningHours } from "@/lib/cms";
 import { T } from "@/lib/editing";
 import { NAVY } from "@/lib/site";
@@ -118,7 +119,13 @@ export default function SiteFooter({ seamless = false }: { seamless?: boolean })
               style={FEATHER}
               className="pointer-events-none absolute [--fl:16px] [--fr:52px] bg-white/[0.88] sm:[--fl:24px] sm:[--fr:88px]"
             />
-            <img src={logo} alt="For You Burritos" className="relative h-10 w-auto sm:h-12" />
+            <EditableImage
+              imageKey="brand.logo_image"
+              fallback={logo}
+              alt="For You Burritos"
+              hint="Samma logotyp som i sidhuvudet"
+              className="relative h-10 w-auto sm:h-12"
+            />
           </Link>
           <T
             as="p"

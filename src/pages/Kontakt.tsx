@@ -10,6 +10,7 @@ import {
   Send,
 } from "lucide-react";
 
+import EditableImage from "@/components/EditableImage";
 import MobileActionBar from "@/components/MobileActionBar";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
@@ -231,13 +232,18 @@ export default function Kontakt() {
           under the headline: the first thing a visitor to a contact page wants
           to know is whether anyone is there right now. */}
       <section className="relative isolate overflow-hidden" style={{ backgroundColor: NAVY }}>
-        <img
-          src={heroBg.src}
+        <EditableImage
+          variant="corner"
+          imageKey="kontakt.hero_image"
+          fallback={heroBg.src}
           alt=""
+          ariaHidden
           width={heroBg.width}
           height={heroBg.height}
+          loading="eager"
           fetchPriority="high"
           decoding="async"
+          hint="Liggande bild — ligger under en mörk ton"
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0" style={{ backgroundColor: NAVY, opacity: 0.75 }} />
@@ -367,13 +373,17 @@ export default function Kontakt() {
               className="relative isolate overflow-hidden rounded-lg lg:col-span-7 lg:col-start-1 lg:row-start-2"
               style={{ backgroundColor: NAVY }}
             >
-              <img
-                src={shopfront.src}
+              <EditableImage
+                variant="corner"
+                imageKey="kontakt.shopfront_image"
+                fallback={shopfront.src}
                 alt=""
+                ariaHidden
                 width={shopfront.width}
                 height={shopfront.height}
                 loading="lazy"
                 decoding="async"
+                hint="Bild på butiken — ligger under en mörk ton"
                 className="absolute inset-0 h-full w-full object-cover"
               />
               <div className="absolute inset-0" style={{ backgroundColor: NAVY, opacity: 0.72 }} />
