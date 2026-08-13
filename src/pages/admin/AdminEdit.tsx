@@ -31,6 +31,32 @@ const PAGES = {
 type PageKey = keyof typeof PAGES;
 
 /**
+ * Wraps the real page while it's being edited. The page is full of real
+ * `<a>`/`<Link>` elements — "BESTÄLL ONLINE", nav links, tel:/mailto:,
+ * footer/social links — and clicking anywhere near one to place a cursor in
+ * an adjacent <T> follows it instead, carrying the owner off to Qopla or
+ * another route. Editing never requires the link to actually work, so
+ * navigation from inside the page is blocked wholesale.
+ *
+ * A capture-phase preventDefault is enough for both cases: it stops a plain
+ * <a>'s default navigation outright, and react-router's <Link> checks
+ * `event.defaultPrevented` before it calls navigate(), so it backs off too.
+ * The toolbar above (page switcher, SEO, INSTÄLLNINGAR) sits outside this
+ * wrapper and keeps working.
+ */
+function EditableStage({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      onClickCapture={(e) => {
+        if ((e.target as HTMLElement).closest("a")) e.preventDefault();
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+/**
  * Floating save bar. Lives inside the provider so it can read the drafts the
  * editable elements register.
  */
@@ -151,7 +177,9 @@ export default function AdminEdit() {
     <EditProvider>
       <KeepAliveWarning />
       <EditToolbar page={page} />
-      <Component />
+      <EditableStage>
+        <Component />
+      </EditableStage>
     </EditProvider>
   );
 }
