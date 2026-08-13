@@ -83,5 +83,30 @@
     "applied_at": "2026-07-28T14:23:06.311285+00:00",
     "name": "seo_stats",
     "version": "0017"
+  },
+  {
+    "applied_at": "2026-08-13T07:10:45.155713+00:00",
+    "name": "external_keep_alive",
+    "version": "0019"
+  },
+  {
+    "applied_at": "2026-08-13T07:51:13.398669+00:00",
+    "name": "site_images",
+    "version": "0020"
+  },
+  {
+    "applied_at": "2026-08-13T08:21:25.712+00:00",
+    "name": "menu_sheet_artwork",
+    "version": "0021"
+  },
+  {
+    "applied_at": "2026-08-13T08:35:37.68388+00:00",
+    "name": "split_logo",
+    "version": "0022"
+  },
+  {
+    "applied_at": "2026-08-13T09:43:01.381503+00:00",
+    "name": "footer_logo_white",
+    "version": "0023"
   }
 ]
