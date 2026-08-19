@@ -52,8 +52,12 @@ export type LocationRow = {
 export type AboutPointRow = { id?: string; body: string };
 
 /**
- * One item on a printed menu sheet. `slug` is the artwork slot it belongs to;
- * layout lives in MenuSheet1/2.tsx, only the words come from here.
+ * One item on the menu. `slug` is the slot it belongs to; layout lives in the
+ * component, only the words come from here.
+ *
+ * Sheets 1 and 2 are printed spreads, so their slugs name a position in the
+ * artwork. Sheet 3 (Thai) was never printed — there the number is only a
+ * grouping key for the fetch.
  */
 export type MenuItemRow = {
   id?: string;
@@ -151,6 +155,10 @@ const FALLBACK_CONTENT: Record<string, string> = {
   "meny.sheet1_sub": "Poke bowls, burrito sticks, lunchlådor & tillägg",
   "meny.sheet2_title": "SUSHI & ROLLS",
   "meny.sheet2_sub": "Sushimenyer, nigiri, maki, inside-out rolls & tillbehör",
+  // The Thai category (0024). It has no printed spread, so unlike the two above
+  // these head a section that renders the same way at every width.
+  "meny.thai_title": "THAI",
+  "meny.thai_sub": "Currygrytor, nudlar och friterade favoriter — lagade på beställning.",
   "meny.fullscreen_label": "ÖPPNA I FULLSKÄRM",
   "meny.sheet_cta_title": "Hittat din favorit?",
   "meny.sheet_cta_body": "Beställ direkt online — hämta färdigt i Malmö.",
@@ -507,12 +515,14 @@ export const useAboutPoints = (): AboutPointRow[] =>
   useRows<AboutPointRow>("about_points", "id,body", FALLBACK_ABOUT_POINTS);
 
 /**
- * Menu-sheet text, keyed by artwork slot.
+ * Menu text for one sheet, keyed by slot.
  *
  * Returns a lookup rather than a list: the component already knows which slots
  * exist and where they sit, and needs the words for a specific one. A slug with
  * no row yet simply falls through to the hardcoded text in the component, so a
- * sheet renders correctly before its migration has been run.
+ * section renders correctly before its migration has been run.
+ *
+ * `sheet` is 1 or 2 for the printed spreads and 3 for Thai, which has no print.
  */
 export function useMenuItems(sheet: number): Map<string, MenuItemRow> {
   const { data } = useQuery({

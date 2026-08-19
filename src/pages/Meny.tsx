@@ -1,3 +1,4 @@
+import type { ComponentType } from "react";
 import { ArrowRight, Clock, Info } from "lucide-react";
 
 import EditableImage from "@/components/EditableImage";
@@ -5,6 +6,7 @@ import { InfoBlock, InfoGrid } from "@/components/InfoBlock";
 import { MenuList1, MenuList2 } from "@/components/MenuList";
 import MenuSheet1 from "@/components/MenuSheet1";
 import MenuSheet2 from "@/components/MenuSheet2";
+import MenuThai from "@/components/MenuThai";
 import MobileActionBar from "@/components/MobileActionBar";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
@@ -21,7 +23,7 @@ import { NAVY, ORDER_HEADER, RED } from "@/lib/site";
  * carries typos, and three of its sheet-02 prices were transcription errors that
  * are corrected here.
  *
- * Each sheet ships in two forms: `Sheet`, the spread itself, and `List`, the same
+ * A sheet ships in two forms: `Sheet`, the spread itself, and `List`, the same
  * rows reflowed into a single column — see MenuList.tsx for why the spread cannot
  * simply be scaled down.
  *
@@ -34,11 +36,30 @@ import { NAVY, ORDER_HEADER, RED } from "@/lib/site";
  *
  * The classes are written out in full rather than composed from a breakpoint name —
  * Tailwind scans source text, so `` `hidden ${bp}:block` `` would never be generated.
+ *
+ * THAI is the exception and has no `Sheet` at all: it was never printed, so there is
+ * no artwork to position against and nothing to swap. Its one responsive layout
+ * covers every width, which is why `listClass` is empty rather than a breakpoint.
+ *
+ * Order is deliberate. THAI sits between the two spreads rather than after them:
+ * last, it read as an appendix to the menu rather than a part of it, and the page
+ * closed on its plainest section instead of on a printed sheet.
  */
-const SHEETS = [
+type Section = {
+  id: string;
+  titleKey: string;
+  subKey: string;
+  /** The layout shown at every width a `Sheet` is not. */
+  List: ComponentType;
+  listClass: string;
+  /** The printed spread, where one exists. */
+  Sheet?: ComponentType<{ className?: string }>;
+  sheetClass?: string;
+};
+
+const SECTIONS: Section[] = [
   {
     id: "burritos",
-    n: "01",
     titleKey: "meny.sheet1_title",
     subKey: "meny.sheet1_sub",
     Sheet: MenuSheet1,
@@ -47,8 +68,14 @@ const SHEETS = [
     sheetClass: "hidden lg:block",
   },
   {
+    id: "thai",
+    titleKey: "meny.thai_title",
+    subKey: "meny.thai_sub",
+    List: MenuThai,
+    listClass: "",
+  },
+  {
     id: "sushi",
-    n: "02",
     titleKey: "meny.sheet2_title",
     subKey: "meny.sheet2_sub",
     Sheet: MenuSheet2,
@@ -199,7 +226,7 @@ export default function Meny() {
           a Blackhawk heading above, and an order prompt directly below — reading
           a menu is exactly the moment someone is ready to order, so the action is
           there rather than only at the foot of the page. */}
-      {SHEETS.map((s) => (
+      {SECTIONS.map((s) => (
         <section
           key={s.id}
           id={s.id}
@@ -228,9 +255,11 @@ export default function Meny() {
           <div className={`mt-8 ${s.listClass}`}>
             <s.List />
           </div>
-          <div className={`mt-10 ${s.sheetClass}`}>
-            <s.Sheet />
-          </div>
+          {s.Sheet && (
+            <div className={`mt-10 ${s.sheetClass}`}>
+              <s.Sheet />
+            </div>
+          )}
 
           {/* Order prompt, one per sheet. Light rather than navy: the closing band
               is the page's navy moment, and three of them would flatten it. */}

@@ -278,6 +278,7 @@ src/
   components/
     SiteHeader.tsx       # shared header/nav, used by ALL pages
     SiteFooter.tsx       # shared footer — tagline, nav, öppettider, kontakt
+    MenuThai.tsx         # /meny's Thai category — no printed sheet, one responsive view
     ui/                  # 50 shadcn components — ALL UNUSED, see below
   hooks/use-mobile.tsx   # unused
   pages/admin/
@@ -348,8 +349,8 @@ supabase/
   - The two swap at the width where that sheet's smallest type is still legible, and
     **that width differs per sheet**: 01 needs ~860px and switches at `lg`, 02 needs
     ~1100px (denser spread, 1440 design px against 01's 1024) and switches only at `xl`.
-    Written out as full class strings in `SHEETS`, since Tailwind scans source text and
-    would never generate `` `hidden ${bp}:block` ``.
+    Written out as full class strings in `SECTIONS`, since Tailwind scans source text
+    and would never generate `` `hidden ${bp}:block` ``.
   - The page used to pan both sheets sideways below `md` instead. That put half of every
     spread off-screen on a phone, and left sheet 02 unreadable on tablets too. Don't
     reintroduce the pan container.
@@ -363,6 +364,36 @@ supabase/
   - In-place editing (`<T>`) is wired up in the **sheets only**. Two contentEditables
     bound to one row would share a draft slot, and `/admin/edit` is used at desktop width
     where the sheet is what renders.
+
+- **The THAI category on `/meny` is the one section with no sheet** (added 2026-08-19,
+  migration `0024`). It was never printed, so `src/components/MenuThai.tsx` is the whole
+  of it: one responsive grid, 3 columns at `lg` down to 1 below `sm`. Everything above
+  about pairing a sheet with a list does **not** apply to it — there is nothing to swap,
+  its `SECTIONS` entry has no `Sheet`, and `listClass` is deliberately empty.
+  - **It sits between the two spreads, not after them.** Placed last it read as an
+    appendix rather than part of the menu, and the page closed on its plainest section.
+    Section order in `SECTIONS` is `burritos` → `thai` → `sushi`.
+  - **It carries a red banner for a reason.** Hairline rules on white made it look like
+    a page of text dropped between two colour-saturated scans. Every group on the
+    printed sheets is a bordered panel under a red banner of white tracked caps
+    (`POKE BOWLS`, `TILLÄGG`), and `MenuList`'s `Group` already restates that device
+    for phones — so this uses it too rather than inventing a third look. Don't flatten
+    it back to plain rules.
+  - The banner repeats the section's `<h2>` from the **same** `meny.thai_title` key and
+    is deliberately **not** wrapped in `<T>` — two contentEditables on one key would
+    share a draft slot. The `<h2>` is the editable one; the banner follows it on save,
+    so it lags by one save inside `/admin/edit`.
+  - Rows live under `sheet = 3` in `menu_items`, slugs `s3.thai.N`. The sheet number is
+    only a grouping key for the fetch there; it does not name a scan.
+  - Because nothing renders these rows twice, `<T>` **is** wired up on the items — so
+    names, prices and descriptions are editable at `/admin/edit?page=meny`, and unlike
+    the sheets, items can be added or removed by INSERT/DELETE rather than being pinned
+    to a fixed slot in artwork.
+  - Fallback copy lives in the `THAI` array in that file (deliberately not exported, so
+    a second view cannot be built off it); the heading is `meny.thai_title` /
+    `meny.thai_sub` in `site_content`, mirrored in `FALLBACK_CONTENT`.
+  - No per-item photos, by choice. Prices are stored in the site's `119:-` form, not the
+    ordering system's `119 kr`, so they match every other price on the page.
 - **`/meny` needs an SPA rewrite on the host.** `vite preview` falls back to `index.html`
   automatically; a plain static host does not. Deep-linking `/meny` 404s without a
   `/* -> /index.html 200` rule.
