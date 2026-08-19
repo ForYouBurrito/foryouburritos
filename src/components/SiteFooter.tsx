@@ -115,117 +115,103 @@ export default function SiteFooter({ seamless = false }: { seamless?: boolean })
         />
       </div>
 
-      {/* Öppettider / Hör av dig / Snabblänkar — mobile only, 3-up per the
-          mockup (not stacked). Order here is Öppettider → Hör av dig →
-          Snabblänkar, left to right, which is a reorder from the desktop grid
-          below. Only column 1 (Öppettider) is populated so far — columns 2
-          and 3 are filled in by later pieces; grid-cols-3 alone reserves
-          their width in the meantime. */}
-      <div className="sm:hidden mt-24 mb-14 grid grid-cols-3 gap-4 px-4">
-        {/* Öppettider */}
-        <div>
-          <ColHeading k="footer.hours_heading" />
-          {/* The footer is shared by every page, so editing a row here in
-              /admin/edit changes the opening hours site-wide. */}
-          <dl className="mt-5 space-y-2">
-            {openingHours.map((o) => (
-              <div
-                key={o.id ?? o.day_label}
-                className="flex items-baseline gap-2 text-xs text-white/75 sm:text-sm"
-              >
-                <dt className="shrink-0">
-                  <T row={o} table="opening_hours" field="day_label" />
-                </dt>
-                {/* Leader-line rule filling the gap between day and hours,
-                    e.g. "Mån ────── 11–21". Nudged up 3px so it sits on the
-                    visual midline between the two text baselines rather than
-                    on the (lower) shared baseline itself. */}
-                <span
-                  className="h-px flex-1 translate-y-[-3px] bg-white/20"
-                  aria-hidden="true"
-                />
-                <dd className="tabular-nums shrink-0">
-                  <T row={o} table="opening_hours" field="hours" />
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </div>
+      {/* Öppettider / Hör av dig — mobile only, 2-up side by side. Snabblänkar
+          used to sit beside these as a third column, but at ~108px that
+          squeezed "Hör av dig" enough that the phone number and email
+          wrapped onto two lines — unacceptable for a tap target. Snabblänkar
+          now runs full-width below instead, so these two get half the row
+          each. */}
+      <div className="sm:hidden mt-24 mb-14 px-4">
+        <div className="grid grid-cols-2 gap-4">
+          {/* Öppettider */}
+          <div>
+            <ColHeading k="footer.hours_heading" />
+            {/* The footer is shared by every page, so editing a row here in
+                /admin/edit changes the opening hours site-wide. */}
+            <dl className="mt-5 space-y-2">
+              {openingHours.map((o) => (
+                <div
+                  key={o.id ?? o.day_label}
+                  className="flex items-baseline gap-2 text-xs text-white/75 sm:text-sm"
+                >
+                  <dt className="shrink-0">
+                    <T row={o} table="opening_hours" field="day_label" />
+                  </dt>
+                  {/* Leader-line rule filling the gap between day and hours,
+                      e.g. "Mån ────── 11–21". Nudged up 3px so it sits on the
+                      visual midline between the two text baselines rather than
+                      on the (lower) shared baseline itself. */}
+                  <span
+                    className="h-px flex-1 translate-y-[-3px] bg-white/20"
+                    aria-hidden="true"
+                  />
+                  <dd className="tabular-nums shrink-0">
+                    <T row={o} table="opening_hours" field="hours" />
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
 
-        {/* Hör av dig — same three rows as the desktop column further below,
-            duplicated rather than shared/moved (see the Brand and Öppettider
-            pieces for why). */}
-        <div className="min-w-0">
-          <ColHeading k="footer.contact_heading" />
-          <ul className="mt-5 space-y-1 text-xs text-white/75 sm:text-sm">
-            <li>
-              {/* min-w-0 on the link plus break-all on the span keep this row
-                  inside its 1fr grid track. Without them the anonymous flex
-                  item wrapping an unbroken string (no spaces to wrap on)
-                  refuses to shrink below its full text width, which widens
-                  this column past its third and overlaps the Snabblänkar
-                  links beside it — and since that pushes the whole 3-col grid
-                  wider than the viewport, the entire page becomes
-                  horizontally pannable, not just this column. Applies to both
-                  email and phone: the CMS-editable phone number isn't
-                  guaranteed to be space-separated like the site.ts fallback
-                  ("+46 431 31 14 14") — the live value is "+46765213077",
-                  one unbroken run of digits. */}
-              <a
-                href={`mailto:${contact.email}`}
-                className="flex min-h-9 min-w-0 items-start gap-2.5 py-1 transition hover:text-white"
-              >
-                <Mail className="mt-0.5 h-3.5 w-3.5 shrink-0" strokeWidth={1.5} />
-                <span className="min-w-0 break-all">{contact.email}</span>
-              </a>
-            </li>
-            <li>
-              <a
-                href={`tel:${contact.phoneHref}`}
-                className="flex min-h-9 min-w-0 items-start gap-2.5 py-1 transition hover:text-white"
-              >
-                <Phone className="mt-0.5 h-3.5 w-3.5 shrink-0" strokeWidth={1.5} />
-                <span className="min-w-0 break-all">{contact.phone}</span>
-              </a>
-            </li>
-            <li>
-              <a
-                href={`https://www.google.com/maps?q=${encodeURIComponent(contact.address)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex min-h-9 items-start gap-2.5 py-1 transition hover:text-white"
-              >
-                <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" strokeWidth={1.5} />
-                {contact.address}
-              </a>
-            </li>
-          </ul>
+          {/* Hör av dig — same three rows as the desktop column further below,
+              duplicated rather than shared/moved (see the Brand and Öppettider
+              pieces for why). */}
+          <div className="min-w-0">
+            <ColHeading k="footer.contact_heading" />
+            <ul className="mt-5 space-y-1 text-xs text-white/75 sm:text-sm">
+              <li>
+                {/* min-w-0 on the link plus break-all on the span keep this row
+                    inside its 1fr grid track. Without them the anonymous flex
+                    item wrapping an unbroken string (no spaces to wrap on)
+                    refuses to shrink below its full text width, which widens
+                    this column past its half and pushes the whole 2-col grid
+                    wider than the viewport, making the entire page
+                    horizontally pannable, not just this column. Applies to
+                    both email and phone: the CMS-editable phone number isn't
+                    guaranteed to be space-separated like the site.ts fallback
+                    ("+46 431 31 14 14") — the live value is "+46765213077",
+                    one unbroken run of digits. */}
+                <a
+                  href={`mailto:${contact.email}`}
+                  className="flex min-h-9 min-w-0 items-start gap-2.5 py-1 transition hover:text-white"
+                >
+                  <Mail className="mt-0.5 h-3.5 w-3.5 shrink-0" strokeWidth={1.5} />
+                  <span className="min-w-0 break-all">{contact.email}</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href={`tel:${contact.phoneHref}`}
+                  className="flex min-h-9 min-w-0 items-start gap-2.5 py-1 transition hover:text-white"
+                >
+                  <Phone className="mt-0.5 h-3.5 w-3.5 shrink-0" strokeWidth={1.5} />
+                  <span className="min-w-0 break-all">{contact.phone}</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href={`https://www.google.com/maps?q=${encodeURIComponent(contact.address)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex min-h-9 items-start gap-2.5 py-1 transition hover:text-white"
+                >
+                  <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" strokeWidth={1.5} />
+                  {contact.address}
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
 
         {/* Snabblänkar — same four links as the desktop column further below,
             duplicated rather than shared/moved (see the Brand and Öppettider
-            pieces for why). The nowrap wrapper is needed only here: at ~108px
-            this grid column is narrower than "SNABBLÄNKAR" set in
-            ColHeading's shared tracking-[0.25em] bold-caps treatment, and the
-            global `h2 { overflow-wrap: break-word }` rule in index.css (meant
-            for long addresses/compounds) otherwise breaks it mid-word
-            ("SNABBLÄNKA" / "R") instead of overflowing. whitespace-nowrap
-            keeps it on one baseline like ÖPPETTIDER/HÖR AV DIG without
-            touching ColHeading's own styling. */}
-        <div>
-          <div className="whitespace-nowrap">
-            <ColHeading k="footer.links_heading" />
-          </div>
-          {/* Same overflow-wrap problem hits the longest link ("KONTAKTA
-              OSS") as hits the heading above it — the column is narrower
-              than the label at this tracking/weight, so index.css's
-              `h2 { overflow-wrap: break-word }`-style wrapping (applied
-              here via the browser's default text wrap) breaks it mid-phrase
-              instead of overflowing. whitespace-nowrap keeps every link on
-              one baseline, matching ÖPPETTIDER/HÖR AV DIG's rhythm. Scoped
-              to this mobile nav only — FooterLink itself is shared with the
-              desktop column and must not change. */}
-          <nav className="mt-5 whitespace-nowrap">
+            pieces for why). Laid out as a horizontal, wrapping, centered row
+            (not the desktop's left-aligned vertical stack) since it now
+            spans the full row width under Öppettider/Hör av dig rather than
+            sitting in its own narrow grid track. */}
+        <div className="mt-10 text-center">
+          <ColHeading k="footer.links_heading" />
+          <nav className="mt-5 flex flex-wrap justify-center gap-x-6 gap-y-1">
             {navLinks.map((l) => (
               <FooterLink key={l.label} href={l.href} label={l.label} />
             ))}
