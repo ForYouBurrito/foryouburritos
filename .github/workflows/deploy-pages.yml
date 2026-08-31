@@ -38,6 +38,15 @@ jobs:
           # even though a local .env works fine. Anon key is public by design.
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          # The two form webhooks. Unset secrets arrive as empty strings, which
+          # contact-webhook.ts / catering-webhook.ts already treat as "not
+          # configured" — so leaving these blank changes nothing and the forms
+          # keep delivering to Supabase and /admin/forms as they do today.
+          # They are listed here so that setting the secrets is all it takes:
+          # without these lines a local .env would work and the deployed site
+          # would silently have no webhook, which is a confusing way to find out.
+          VITE_CONTACT_WEBHOOK_URL: ${{ secrets.VITE_CONTACT_WEBHOOK_URL }}
+          VITE_CATERING_WEBHOOK_URL: ${{ secrets.VITE_CATERING_WEBHOOK_URL }}
         run: npm run build
 
       - name: Upload Pages artifact
