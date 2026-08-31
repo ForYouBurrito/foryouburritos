@@ -5,6 +5,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminEdit from "./pages/admin/AdminEdit";
 import AdminLogin from "./pages/admin/AdminLogin";
+import AdminForms from "./pages/admin/AdminForms";
 import AdminSeo from "./pages/admin/AdminSeo";
 import Catering from "./pages/Catering";
 import Index from "./pages/Index";
@@ -33,6 +34,7 @@ export default function App() {
           <Route path="/admin" element={<Navigate to="/admin/edit" replace />} />
           <Route path="/admin/edit" element={<AdminEdit />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
+          <Route path="/admin/forms" element={<AdminForms />} />
           <Route path="/admin/seo" element={<AdminSeo />} />
           {/* Keep the catch-all last. */}
           <Route path="*" element={<NotFound />} />

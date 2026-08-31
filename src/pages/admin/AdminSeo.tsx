@@ -1,5 +1,5 @@
 import { Link, Navigate } from "react-router-dom";
-import { AlertTriangle, ArrowLeft, Clock, Loader2, LogOut, Search } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Clock, Inbox, Loader2, LogOut, Search } from "lucide-react";
 
 import { signOut, useSession } from "@/lib/auth";
 import { NAVY, RED } from "@/lib/site";
@@ -199,6 +199,13 @@ export default function AdminSeo() {
         <div className="mx-auto flex max-w-4xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
           <h1 className="text-xs font-bold tracking-[0.25em] text-white">SEO</h1>
           <div className="flex items-center gap-3">
+            <Link
+              to="/admin/forms"
+              className="inline-flex items-center gap-1.5 rounded-sm px-2 py-1.5 text-[10px] font-bold tracking-wider text-white/70 transition hover:text-white"
+            >
+              <Inbox className="h-3 w-3" />
+              FÖRFRÅGNINGAR
+            </Link>
             <Link
               to="/admin/edit"
               className="inline-flex items-center gap-1.5 rounded-sm px-2 py-1.5 text-[10px] font-bold tracking-wider text-white/70 transition hover:text-white"

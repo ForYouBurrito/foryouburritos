@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, Navigate, useSearchParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import { Check, Loader2, LogOut, Search, SlidersHorizontal } from "lucide-react";
+import { Check, Inbox, Loader2, LogOut, Search, SlidersHorizontal } from "lucide-react";
 
 import KeepAliveWarning from "@/components/admin/KeepAliveWarning";
 import { signOut, useSession } from "@/lib/auth";
@@ -41,7 +41,7 @@ type PageKey = keyof typeof PAGES;
  * A capture-phase preventDefault is enough for both cases: it stops a plain
  * <a>'s default navigation outright, and react-router's <Link> checks
  * `event.defaultPrevented` before it calls navigate(), so it backs off too.
- * The toolbar above (page switcher, SEO, INSTÄLLNINGAR) sits outside this
+ * The toolbar above (page switcher, FÖRFRÅGNINGAR, SEO, INSTÄLLNINGAR) sits outside this
  * wrapper and keeps working.
  */
 function EditableStage({ children }: { children: React.ReactNode }) {
@@ -123,6 +123,13 @@ function EditToolbar({ page }: { page: PageKey }) {
               {error}
             </span>
           )}
+          <Link
+            to="/admin/forms"
+            className="inline-flex items-center gap-1.5 rounded-sm px-2 py-1.5 text-[10px] font-bold tracking-wider text-white/70 transition hover:text-white"
+          >
+            <Inbox className="h-3 w-3" />
+            FÖRFRÅGNINGAR
+          </Link>
           <Link
             to="/admin/seo"
             className="inline-flex items-center gap-1.5 rounded-sm px-2 py-1.5 text-[10px] font-bold tracking-wider text-white/70 transition hover:text-white"

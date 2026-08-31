@@ -157,6 +157,8 @@ agree. Every new migration file must end by inserting its own version row.
 | `about_points` | the "Vår filosofi" bullets on `/om-oss` |
 | `nav_links` | header + footer navigation |
 | `opening_hours` | footer opening hours |
+| `contact_submissions` | /kontakt form submissions, read at `/admin/forms` |
+| `catering_submissions` | /catering form submissions, read at `/admin/forms` |
 | `keep_alive` | single-row heartbeat, see below |
 | `seo_daily` / `seo_queries` / `seo_pages` / `seo_vitals` / `seo_meta` | Search Console + PageSpeed figures for `/admin/seo`, see below |
 | `schema_migrations` | the ledger above |
@@ -282,8 +284,10 @@ src/
     ui/                  # 50 shadcn components — ALL UNUSED, see below
   hooks/use-mobile.tsx   # unused
   pages/admin/
+    AdminForms.tsx       # "/admin/forms" — the two forms' submissions, + handled flag
     AdminSeo.tsx         # "/admin/seo" — Search Console figures, read-only
   lib/
+    form-submissions.ts  # insert + read layer for the two form tables. NO fallbacks
     seo-stats.ts         # read layer for the SEO tables. NO fallbacks, by design
     site.ts              # RED / NAVY / ORDER_HEADER / MENU_LINK / NAV_LINKS
                          # + TAGLINE / CONTACT / OPENING_HOURS
@@ -291,6 +295,8 @@ src/
 public/
   favicon.ico
   assets/                # recovered originals + Lovable asset-ID README
+docs/
+  n8n-forms.md           # the two form webhooks: setup, sheet columns, CORS gotcha
 supabase/
   migrations/            # numbered .sql, applied by hand in the dashboard
 .github/workflows/
@@ -309,13 +315,44 @@ supabase/
   `+46 431 31 14 14`, Östergatan 21). The old catering page printed these as text but linked
   them to `contact@mysite.com` / `123-456-7890` placeholders — always build `mailto:`/`tel:`
   hrefs from `CONTACT`, never retype them.
-- **The catering form posts to a webhook placeholder.** `src/lib/catering-webhook.ts` owns
-  the payload shape and the POST; `VITE_CATERING_WEBHOOK_URL` (optional, documented in
-  `.env.example`) is the endpoint. Unset, down, timed out or CORS-rejected — every failure
-  path falls through to the `mailto:` handoff to `CONTACT.email`, so a request is never
-  silently dropped. In dev with no URL set, the payload is logged to the console.
-  The URL **ships in the client bundle and is public**: use a catch hook, not an
-  authenticated API, and rate-limit on the receiving end.
+- **⚠️ Both public forms deliver to TWO destinations at once, and either one counts.**
+  `/kontakt` and `/catering` each fire, in parallel:
+  1. a Supabase insert into `contact_submissions` / `catering_submissions`, read back
+     by the `/admin/forms` panel, and
+  2. a POST to its own n8n webhook (`VITE_CONTACT_WEBHOOK_URL` /
+     `VITE_CATERING_WEBHOOK_URL`), which appends a row to a Google Sheet.
+
+  They are **independent, not a chain** — that is the point. n8n being down must not
+  stop the panel, and Supabase cold-starting on the free tier must not stop the sheet.
+  Only when *both* fail does the page fall through to the `mailto:` handoff to
+  `CONTACT.email`, so a lead is never silently dropped. This is also why Supabase does
+  **not** forward to n8n with a Database Webhook: a chain has one point of failure.
+
+  Consequences worth knowing:
+  - **The sheet and the panel can legitimately disagree.** Neither is a copy of the
+    other and there is no sync job. A row in one but not the other means that
+    destination failed at that moment; the reason is `console.warn`-ed, never shown
+    to the visitor.
+  - `catering-webhook.ts` / `contact-webhook.ts` own the payload shape and the POST;
+    `form-submissions.ts` owns the insert **and takes the same payload objects**, so
+    there is one definition of a submission and the two destinations cannot drift.
+  - The webhook URLs **ship in the client bundle and are public**: use a catch hook,
+    not an authenticated API, and rate-limit on the n8n side. `VITE_` vars are baked
+    in at build time — changing `.env` does nothing until the next `npm run build`.
+  - **The n8n Webhook node needs its CORS "Allowed Origins" set** or the browser's
+    preflight is rejected and the POST is never sent. Full setup, the sheet column
+    lists and the three-state `staff`/`delivery` gotcha: `docs/n8n-forms.md`.
+  - These are the only tables `anon` can write to. `anon` gets **insert and nothing
+    else** — it cannot read back other people's names and phone numbers.
+- **`/admin/forms` is self-contained and does not need n8n.** It reads Supabase and
+  nothing else, so the panel is fully working with both webhook URLs unset — which is
+  the current state. Every mention of the spreadsheet in its copy is conditional on
+  `hasContactWebhook` / `hasCateringWebhook`, so it never points the client at a sheet
+  that does not exist. Its only prerequisite is migration `0025` being applied.
+- **`/admin/forms` has no fallbacks, like `/admin/seo` and unlike `cms.ts`.** An empty
+  list means nobody has written in. A failed *read* renders as an error, deliberately
+  not as an empty inbox — that is the one way the page could lie about there being no
+  customers waiting.
 - **Redesign in progress (2026-07-27).** The new visual direction is negative-space /
   minimalistic / franchise, and `src/pages/Meny.tsx` is the first page built to it —
   generous vertical rhythm, a single large Blackhawk headline, hairline `border-border`

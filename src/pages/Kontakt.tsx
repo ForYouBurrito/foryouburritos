@@ -22,6 +22,7 @@ import {
   sendContactRequest,
 } from "@/lib/contact-webhook";
 import { T } from "@/lib/editing";
+import { saveContactSubmission } from "@/lib/form-submissions";
 import { NAVY, RED } from "@/lib/site";
 
 /**
@@ -190,9 +191,20 @@ export default function Kontakt() {
     )}&body=${encodeURIComponent(buildSummary(form))}`;
 
   /**
-   * POST to VITE_CONTACT_WEBHOOK_URL when configured. Until it is — and whenever
-   * the endpoint is down, times out or rejects CORS — the message falls through
-   * to `mailto:` rather than being dropped on the floor.
+   * Two destinations, fired together and independent of each other:
+   *
+   *   Supabase `contact_submissions` -> /admin/forms
+   *   VITE_CONTACT_WEBHOOK_URL (n8n) -> the Google Sheet
+   *
+   * `allSettled`, not a race and not a chain: a slow or broken n8n must not stop
+   * the row reaching the panel, and Supabase cold-starting on the free tier must
+   * not stop the sheet. EITHER landing counts as delivered — the message exists
+   * somewhere the restaurant can see it.
+   *
+   * Only when both fail does this fall through to `mailto:`, which is also what
+   * happens while the webhook URL is still unset: `sendContactRequest` returns
+   * false rather than throwing, so an unconfigured endpoint is just one more
+   * failed destination rather than a special case.
    */
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -200,17 +212,29 @@ export default function Kontakt() {
 
     const payload = buildContactPayload(form);
 
-    if (hasContactWebhook) {
-      const result = await sendContactRequest(payload);
-      if (result.ok) {
-        setForm(EMPTY_FORM);
-        setStatus("sent");
-        return;
-      }
-      console.warn("[kontakt] webhook failed, falling back to mailto:", result.reason);
-    } else if (import.meta.env.DEV) {
-      console.info("[kontakt] no VITE_CONTACT_WEBHOOK_URL set. Payload:", payload);
+    const [saved, sent] = await Promise.all([
+      saveContactSubmission(payload),
+      hasContactWebhook
+        ? sendContactRequest(payload)
+        : Promise.resolve({ ok: false as const, reason: "VITE_CONTACT_WEBHOOK_URL is not set" }),
+    ]);
+
+    if (saved.ok || sent.ok) {
+      // Half-delivered is still delivered, but the half that failed is a real
+      // fault someone has to fix — say so in the console, never to the visitor.
+      if (!saved.ok) console.warn("[kontakt] database insert failed:", saved.reason);
+      if (!sent.ok) console.warn("[kontakt] n8n webhook failed:", sent.reason);
+      setForm(EMPTY_FORM);
+      setStatus("sent");
+      return;
     }
+
+    console.warn(
+      "[kontakt] both destinations failed, falling back to mailto:",
+      saved.reason,
+      sent.reason,
+    );
+    if (import.meta.env.DEV) console.info("[kontakt] payload was:", payload);
 
     window.location.href = mailtoHref();
     setStatus("mailto");

@@ -25,6 +25,7 @@ import {
   hasCateringWebhook,
   sendCateringRequest,
 } from "@/lib/catering-webhook";
+import { saveCateringSubmission } from "@/lib/form-submissions";
 import { useCateringBlocks, useContact } from "@/lib/cms";
 import { T } from "@/lib/editing";
 import { CONTACT, NAVY, RED } from "@/lib/site";
@@ -185,9 +186,19 @@ export default function Catering() {
     )}&body=${encodeURIComponent(buildSummary(form, dishes))}`;
 
   /**
-   * POST to VITE_CATERING_WEBHOOK_URL when it is configured. Until it is — and
-   * whenever the endpoint is down, times out or rejects CORS — the request falls
-   * through to `mailto:` rather than being dropped on the floor.
+   * Two destinations, fired together and independent of each other:
+   *
+   *   Supabase `catering_submissions`  -> /admin/forms
+   *   VITE_CATERING_WEBHOOK_URL (n8n)  -> the Google Sheet
+   *
+   * `allSettled`, not a race and not a chain: a slow or broken n8n must not stop
+   * the row reaching the panel, and Supabase cold-starting on the free tier must
+   * not stop the sheet. EITHER landing counts as delivered.
+   *
+   * Only when both fail does this fall through to `mailto:` — which is also what
+   * happens while the webhook URL is still unset, since `sendCateringRequest`
+   * returns false rather than throwing. A catering enquiry is the most valuable
+   * thing this site collects; it does not get dropped on the floor.
    */
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -195,19 +206,30 @@ export default function Catering() {
 
     const payload = buildCateringPayload(form, dishes);
 
-    if (hasCateringWebhook) {
-      const result = await sendCateringRequest(payload);
-      if (result.ok) {
-        setForm(EMPTY_FORM);
-        setDishes([]);
-        setStatus("sent");
-        return;
-      }
-      console.warn("[catering] webhook failed, falling back to mailto:", result.reason);
-    } else if (import.meta.env.DEV) {
-      // No endpoint yet — show what would have been sent.
-      console.info("[catering] no VITE_CATERING_WEBHOOK_URL set. Payload:", payload);
+    const [saved, sent] = await Promise.all([
+      saveCateringSubmission(payload),
+      hasCateringWebhook
+        ? sendCateringRequest(payload)
+        : Promise.resolve({ ok: false as const, reason: "VITE_CATERING_WEBHOOK_URL is not set" }),
+    ]);
+
+    if (saved.ok || sent.ok) {
+      // Half-delivered is still delivered, but the half that failed is a real
+      // fault someone has to fix — say so in the console, never to the visitor.
+      if (!saved.ok) console.warn("[catering] database insert failed:", saved.reason);
+      if (!sent.ok) console.warn("[catering] n8n webhook failed:", sent.reason);
+      setForm(EMPTY_FORM);
+      setDishes([]);
+      setStatus("sent");
+      return;
     }
+
+    console.warn(
+      "[catering] both destinations failed, falling back to mailto:",
+      saved.reason,
+      sent.reason,
+    );
+    if (import.meta.env.DEV) console.info("[catering] payload was:", payload);
 
     window.location.href = mailtoHref();
     setStatus("mailto");
